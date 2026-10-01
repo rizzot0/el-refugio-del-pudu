@@ -1,29 +1,27 @@
 /* ==========================================================================
-   Variables y Paleta de Colores Inspirada en el Bosque Templado Austral
+   Variables y Paleta de Colores - Estética Selva Valdiviana & Pixel Art Cozy
    ========================================================================== */
 :root {
-  --bg-primary: #15241b;
-  --bg-surface: #1e3527;
-  --bg-surface-elevated: #284433;
-  --bg-card: #2f4e3c;
-  --bg-card-hover: #395c47;
+  --bg-dark: #0f1c14;
+  --bg-sidebar: #172a1e;
+  --bg-sidebar-elevated: #203828;
+  --bg-card: #274532;
+  --bg-card-hover: #32573f;
   
-  --primary: #8b3ca0;
-  --primary-light: #ab5ec0;
-  --primary-glow: rgba(139, 60, 160, 0.4);
-  
-  --accent-maqui: #4e1858;
+  --primary: #9333ea;
+  --primary-light: #c084fc;
   --accent-gold: #f59e0b;
   --accent-amber: #fbbf24;
   --accent-rose: #f43f5e;
+  --accent-green: #34d399;
   --accent-blue: #38bdf8;
   
-  --text-main: #f5fbf7;
-  --text-muted: #b8d2c2;
-  --text-dark: #2a1f18;
-  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-warm: #fef08a;
+
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(245, 158, 11, 0.4);
+  --border-highlight: rgba(245, 158, 11, 0.4);
 
   --font-base: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-heading: 'Quicksand', sans-serif;
@@ -33,13 +31,13 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-full: 9999px;
-  
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.5);
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.6);
 }
 
-/* Reset y estilos base */
+/* Reset general */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -49,41 +47,56 @@
 
 body {
   font-family: var(--font-base);
-  background-color: var(--bg-primary);
+  background-color: var(--bg-dark);
   color: var(--text-main);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow-x: hidden;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   user-select: none;
 }
 
-#app {
-  width: 100%;
-  max-width: 580px;
-  min-height: 100vh;
-  background: var(--bg-surface);
+/* ==========================================================================
+   Layout Principal de Dos Columnas: Sidebar Izquierdo + Mundo Visual Derecho
+   ========================================================================== */
+.game-layout {
   display: flex;
-  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
   position: relative;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
 }
 
 /* ==========================================================================
-   Barra Superior
+   LADO IZQUIERDO: Barra Lateral Plegable de Mejoras y Gestión
    ========================================================================== */
-.top-bar {
+.sidebar {
+  width: 380px;
+  min-width: 380px;
+  height: 100vh;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 6px 0 24px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+.sidebar.collapsed {
+  margin-left: -380px;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+/* Encabezado del Sidebar */
+.sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: rgba(18, 33, 24, 0.85);
-  backdrop-filter: blur(10px);
+  padding: 14px 18px;
+  background: rgba(18, 33, 24, 0.95);
   border-bottom: 1px solid var(--border-subtle);
-  position: sticky;
-  top: 0;
-  z-index: 20;
 }
 
 .brand {
@@ -94,10 +107,10 @@ body {
 
 .brand-icon {
   font-size: 26px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
-.brand-text h1 {
+.brand-text h2 {
   font-family: var(--font-heading);
   font-size: 16px;
   font-weight: 700;
@@ -110,74 +123,42 @@ body {
   color: var(--text-muted);
 }
 
-.top-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.weather-pill {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 5px 9px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid var(--border-subtle);
-  color: #e0f2fe;
-}
-
-.btn-pill {
+.btn-icon {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border-subtle);
-  color: var(--text-main);
-  padding: 6px 10px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 700;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  font-size: 14px;
   transition: all 0.2s ease;
 }
 
-.btn-pill:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: scale(1.05);
 }
 
-.btn-pill.active {
-  background: rgba(56, 189, 248, 0.25);
-  border-color: #38bdf8;
-  color: #bae6fd;
-}
-
-.btn-subtle {
-  background: transparent;
-  color: var(--text-muted);
-}
-
-/* ==========================================================================
-   Marcador de Recursos Principal
-   ========================================================================== */
-.resource-banner {
-  padding: 10px 16px;
-  background: linear-gradient(180deg, rgba(20, 40, 28, 0.95) 0%, rgba(26, 48, 34, 0.8) 100%);
+/* Tarjeta de Recursos y Controles en el Sidebar */
+.sidebar-resource-card {
+  padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(22, 44, 30, 0.9) 0%, rgba(28, 52, 36, 0.6) 100%);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.counter-box {
+.resource-row {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .resource-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+  font-size: 36px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
   animation: pulse-berry 3s infinite ease-in-out;
 }
 
@@ -186,90 +167,398 @@ body {
   50% { transform: scale(1.08); }
 }
 
-.counter-number {
+.resource-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.resource-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.resource-val {
   font-family: var(--font-heading);
   font-size: 26px;
   font-weight: 800;
-  color: #fef08a;
-  text-shadow: 0 2px 10px rgba(254, 240, 138, 0.25);
-  line-height: 1;
+  color: var(--text-warm);
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(254, 240, 138, 0.2);
 }
 
-.counter-rate {
-  font-size: 12px;
-  color: var(--text-muted);
+.resource-subrow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
   gap: 8px;
-  margin-top: 3px;
 }
 
-.luck-badge {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #fff;
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-  font-size: 10px;
+.rate-badge {
+  font-size: 12px;
   font-weight: 800;
-  animation: bounce-badge 1s infinite alternate ease-in-out;
-}
-
-.pet-badge {
-  background: linear-gradient(135deg, #f43f5e, #e11d48);
-  color: #fff;
-  padding: 2px 7px;
+  color: var(--accent-green);
+  background: rgba(52, 211, 153, 0.12);
+  padding: 3px 8px;
   border-radius: var(--radius-full);
-  font-size: 10px;
-  font-weight: 800;
-  animation: bounce-badge 1s infinite alternate ease-in-out;
+  border: 1px solid rgba(52, 211, 153, 0.25);
 }
 
-@keyframes bounce-badge {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-2px); }
+.weather-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+  color: #e0f2fe;
+}
+
+.controls-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pill-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 6px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.pill-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.pill-btn.active {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #bae6fd;
+}
+
+/* Pestañas del Menú Izquierdo */
+.sidebar-tabs {
+  display: flex;
+  background: rgba(18, 33, 24, 0.95);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sidebar-tabs .tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 10px 2px;
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.sidebar-tabs .tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-tabs .tab-btn.active {
+  color: var(--text-warm);
+  border-bottom-color: var(--accent-gold);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Contenido Scrolleable de Mejoras */
+.sidebar-content {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.upgrade-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.upgrade-card.affordable {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.upgrade-card.affordable:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+.upgrade-card.locked {
+  opacity: 0.65;
+}
+
+.card-icon {
+  font-size: 24px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-qty {
+  font-size: 10px;
+  color: var(--accent-gold);
+  background: rgba(245, 158, 11, 0.15);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.card-rate {
+  font-size: 10px;
+  color: var(--accent-green);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.buy-btn {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #fff;
+  border: none;
+  padding: 7px 11px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.buy-btn:hover:not(:disabled) {
+  transform: scale(1.04);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.buy-btn:disabled {
+  background: #374151;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Pie del Sidebar */
+.sidebar-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(16, 28, 20, 0.95);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-subtle {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.btn-subtle:hover {
+  color: #fff;
 }
 
 /* ==========================================================================
-   Diorama en Canvas y Cuadros Interactivos
+   LADO DERECHO: Mundo Visual Pixel Art
    ========================================================================== */
-.diorama-container {
+.game-viewport {
+  flex: 1;
+  height: 100vh;
   position: relative;
-  width: 100%;
-  height: 290px;
-  background: #193122;
+  background: #15261b;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.canvas-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 #diorama-canvas {
   width: 100%;
   height: 100%;
   display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
   cursor: pointer;
 }
 
-.diorama-hint {
+/* Botón flotante para reabrir el menú si se oculta */
+.floating-menu-btn {
   position: absolute;
-  top: 8px;
+  top: 16px;
+  left: 16px;
+  z-index: 25;
+  background: rgba(22, 44, 30, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--accent-gold);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
+}
+
+.floating-menu-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(28, 56, 38, 0.95);
+  box-shadow: var(--shadow-lg);
+}
+
+.menu-icon {
+  font-size: 16px;
+  color: var(--accent-gold);
+}
+
+/* HUD Superior en el Viewport */
+.viewport-hud {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.hud-badge {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  animation: bounce-badge 1s infinite alternate ease-in-out;
+}
+
+.luck-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 1px solid #fde047;
+}
+
+.pet-badge {
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  border: 1px solid #fecdd3;
+}
+
+@keyframes bounce-badge {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+/* Barra inferior de pistas de interacción */
+.world-action-bar {
+  position: absolute;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(14, 28, 19, 0.7);
-  backdrop-filter: blur(4px);
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  font-size: 10px;
-  color: var(--text-muted);
-  pointer-events: none;
+  background: rgba(14, 28, 19, 0.78);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border-subtle);
+  padding: 6px 18px;
+  border-radius: var(--radius-full);
+  z-index: 15;
+  pointer-events: none;
   white-space: nowrap;
 }
 
-/* Tarjeta Flotante de Fase 1 */
+.action-hint {
+  font-size: 11px;
+  color: #d1fae5;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Cuadro Especial de Fase 1 */
 .phase-card {
   position: absolute;
-  bottom: 12px;
-  left: 14px;
-  right: 14px;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 440px;
   background: rgba(18, 35, 24, 0.94);
   backdrop-filter: blur(8px);
   border: 1px solid var(--accent-gold);
@@ -277,12 +566,12 @@ body {
   padding: 10px 14px;
   box-shadow: var(--shadow-lg);
   animation: slide-up 0.4s ease;
-  z-index: 10;
+  z-index: 20;
 }
 
 @keyframes slide-up {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
 }
 
 .phase-card-inner {
@@ -301,7 +590,7 @@ body {
 
 .phase-content h4 {
   font-size: 13px;
-  color: #fef08a;
+  color: var(--text-warm);
   font-weight: 700;
 }
 
@@ -335,165 +624,7 @@ body {
 }
 
 /* ==========================================================================
-   Pestañas de Navegación
-   ========================================================================== */
-.tabs-nav {
-  display: flex;
-  background: rgba(15, 28, 20, 0.95);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
-  position: sticky;
-  top: 57px;
-  z-index: 15;
-}
-
-.tab-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 10px 4px;
-  font-family: var(--font-heading);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.tab-btn:hover {
-  color: #fff;
-}
-
-.tab-btn.active {
-  color: #fef08a;
-  border-bottom-color: var(--accent-gold);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.tab-icon {
-  font-size: 15px;
-}
-
-/* ==========================================================================
-   Contenido de Paneles y Listas
-   ========================================================================== */
-.tab-panels {
-  flex: 1;
-  padding: 14px;
-  overflow-y: auto;
-  min-height: 320px;
-}
-
-.cards-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.upgrade-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
-}
-
-.upgrade-card.affordable {
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-.upgrade-card.affordable:hover {
-  background: var(--bg-card-hover);
-  transform: translateY(-1px);
-}
-
-.upgrade-card.locked {
-  opacity: 0.65;
-}
-
-.card-icon {
-  font-size: 26px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: var(--radius-sm);
-}
-
-.card-info {
-  flex: 1;
-}
-
-.card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.card-qty {
-  font-size: 11px;
-  color: var(--accent-gold);
-  background: rgba(245, 158, 11, 0.15);
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-}
-
-.card-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 2px;
-  line-height: 1.3;
-}
-
-.card-rate {
-  font-size: 10px;
-  color: #34d399;
-  font-weight: 700;
-  margin-top: 3px;
-}
-
-.buy-btn {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.buy-btn:hover:not(:disabled) {
-  transform: scale(1.04);
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.buy-btn:disabled {
-  background: #374151;
-  color: #9ca3af;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* ==========================================================================
-   Pestaña Refugio: Manada y Comodidades
+   Elementos de Pestañas: Refugio, Taller y Bitácora
    ========================================================================== */
 .section-header {
   margin: 14px 0 8px 0;
@@ -501,15 +632,15 @@ body {
 
 .section-header h4 {
   font-family: var(--font-heading);
-  font-size: 13px;
-  color: #fef08a;
+  font-size: 12px;
+  color: var(--text-warm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .pudus-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 8px;
   margin-bottom: 12px;
 }
@@ -527,11 +658,11 @@ body {
 }
 
 .pudu-hat {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .pudu-badge strong {
-  font-size: 12px;
+  font-size: 11px;
   color: #fff;
 }
 
@@ -546,56 +677,53 @@ body {
   gap: 8px;
 }
 
-/* ==========================================================================
-   Pestaña Taller Austral
-   ========================================================================== */
+/* Taller */
 .workshop-panel {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 14px;
   text-align: center;
 }
 
 .jam-display {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 14px;
   text-align: left;
 }
 
 .jam-icon {
-  font-size: 42px;
+  font-size: 38px;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
 }
 
 .jam-info h3 {
-  font-size: 15px;
+  font-size: 14px;
   color: #fff;
 }
 
 .jam-info p {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--accent-amber);
   margin-top: 2px;
 }
 
 .jam-info small {
-  font-size: 11px;
-  color: #34d399;
+  font-size: 10px;
+  color: var(--accent-green);
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
-/* Botón CTA general */
 .cta-btn {
   background: linear-gradient(135deg, #8b3ca0 0%, #6b21a8 100%);
   color: #fff;
   border: none;
-  padding: 10px 18px;
+  padding: 9px 16px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(139, 60, 160, 0.4);
@@ -629,79 +757,77 @@ body {
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: 30px 14px;
   color: var(--text-muted);
 }
 
 .empty-icon {
-  font-size: 44px;
+  font-size: 40px;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   opacity: 0.7;
 }
 
-/* ==========================================================================
-   Pestaña Bitácora: El Gran Picnic, Fichas Didácticas y Recuerdos
-   ========================================================================== */
+/* Bitácora y Picnic */
 .picnic-box {
   background: linear-gradient(135deg, rgba(78, 24, 88, 0.5) 0%, rgba(30, 53, 39, 0.8) 100%);
   border: 1px solid var(--primary-light);
   border-radius: var(--radius-md);
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
   box-shadow: var(--shadow-md);
 }
 
 .picnic-box h3 {
   font-family: var(--font-heading);
-  font-size: 16px;
-  color: #fef08a;
+  font-size: 15px;
+  color: var(--text-warm);
   margin-bottom: 4px;
 }
 
 .picnic-box p {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.4;
-  margin-bottom: 12px;
+  line-height: 1.35;
+  margin-bottom: 10px;
 }
 
 .picnic-requirements {
   display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .req-item {
   flex: 1;
   background: rgba(0, 0, 0, 0.3);
-  padding: 8px 10px;
+  padding: 7px 8px;
   border-radius: var(--radius-sm);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
 }
 
 .req-item.done {
-  border-color: #34d399;
-  color: #34d399;
+  border-color: var(--accent-green);
+  color: var(--accent-green);
   background: rgba(52, 211, 153, 0.12);
 }
 
-/* Cuadrícula de Fichas Didácticas */
+/* Fichas Didácticas */
 .fauna-grid {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .fauna-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 9px 11px;
   transition: all 0.2s ease;
 }
 
@@ -716,22 +842,23 @@ body {
 .fauna-top {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .fauna-icon {
-  font-size: 24px;
-  width: 36px;
-  height: 36px;
+  font-size: 22px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,0.25);
   border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 
 .fauna-top strong {
-  font-size: 13px;
+  font-size: 12px;
   color: #fff;
   display: block;
 }
@@ -744,11 +871,11 @@ body {
 
 .fauna-cat {
   margin-left: auto;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
   text-transform: uppercase;
   background: rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: var(--radius-full);
   color: #a7f3d0;
 }
@@ -756,32 +883,32 @@ body {
 .fauna-desc {
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 6px;
+  margin-top: 5px;
   line-height: 1.35;
 }
 
 .fauna-reward {
   font-size: 10px;
-  color: #fef08a;
+  color: var(--text-warm);
   font-weight: 700;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 /* Recuerdos */
 .recuerdos-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .recuerdo-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .recuerdo-card.unlocked {
@@ -794,29 +921,29 @@ body {
 }
 
 .recuerdo-icon {
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .recuerdo-text strong {
-  font-size: 12px;
-  color: #fef08a;
+  font-size: 11px;
+  color: var(--text-warm);
   display: block;
 }
 
 .recuerdo-text p {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   margin-top: 2px;
   line-height: 1.3;
 }
 
 /* ==========================================================================
-   Modal del Regalo y Sobre Interactivo
+   Modal del Regalo
    ========================================================================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -835,7 +962,7 @@ body {
   width: 100%;
   max-width: 480px;
   background: #fdfbf7;
-  color: var(--text-dark);
+  color: #2b1d16;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
@@ -856,10 +983,10 @@ body {
 }
 
 .wax-seal {
-  font-size: 48px;
-  width: 72px;
-  height: 72px;
-  line-height: 72px;
+  font-size: 46px;
+  width: 68px;
+  height: 68px;
+  line-height: 68px;
   background: #2b5138;
   border-radius: var(--radius-full);
   margin: 0 auto 16px auto;
@@ -885,7 +1012,7 @@ body {
 }
 
 .letter-content {
-  padding: 28px 24px;
+  padding: 26px 22px;
   max-height: 75vh;
   overflow-y: auto;
 }
@@ -901,7 +1028,7 @@ body {
 
 .letter-header h2 {
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: 19px;
   color: #4a2810;
 }
 
@@ -910,24 +1037,24 @@ body {
 }
 
 .letter-body {
-  font-size: 14px;
+  font-size: 13.5px;
   line-height: 1.6;
   color: #3d2c20;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 .letter-footer {
   text-align: right;
-  margin-top: 16px;
+  margin-top: 14px;
   border-top: 1px dashed #d1c1b1;
-  padding-top: 14px;
+  padding-top: 12px;
 }
 
 .letter-footer p {
-  font-size: 13px;
+  font-size: 12px;
   color: #715848;
 }
 
@@ -940,7 +1067,7 @@ body {
 }
 
 .letter-actions {
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 /* ==========================================================================
@@ -948,16 +1075,14 @@ body {
    ========================================================================== */
 #notifications-container {
   position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 20px;
+  right: 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   z-index: 90;
   pointer-events: none;
-  width: 90%;
-  max-width: 440px;
+  max-width: 360px;
 }
 
 .toast {
@@ -966,7 +1091,6 @@ body {
   font-size: 12px;
   font-weight: 700;
   box-shadow: var(--shadow-md);
-  text-align: center;
   animation: toast-in 0.25s ease;
   backdrop-filter: blur(8px);
 }
@@ -1024,7 +1148,42 @@ body {
   color: #fee2e2;
 }
 
-/* Clases de utilidad */
 .hidden {
   display: none !important;
+}
+
+/* ==========================================================================
+   Adaptabilidad Responsive (Móvil y Pantallas Pequeñas)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 320px;
+    min-width: 320px;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+  }
+
+  .sidebar.collapsed {
+    margin-left: -320px;
+  }
+
+  .world-action-bar {
+    width: 90%;
+    text-align: center;
+  }
+
+  .action-hint {
+    font-size: 10px;
+    white-space: normal;
+  }
+
+  #notifications-container {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 90%;
+  }
 }

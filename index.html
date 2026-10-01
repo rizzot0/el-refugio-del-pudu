@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>El Refugio de los Pudús - Un Regalo del Bosque Austral</title>
+  <title>El Refugio de los Pudús - Juego Incremental Pixel Art</title>
   
-  <!-- Tipografías Cálidas y Modernas -->
+  <!-- Tipografías Cálidas y Legibles -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
@@ -13,62 +13,138 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Barra Superior -->
-    <header class="top-bar">
-      <div class="brand">
-        <span class="brand-icon">🦌</span>
-        <div class="brand-text">
-          <h1>El Refugio de los Pudús</h1>
-          <p class="subtitle">Bosque Valdiviano & Cosecha de Maquis</p>
-        </div>
-      </div>
-      <div class="top-controls">
-        <div id="weather-badge" class="weather-pill" title="Clima actual del bosque">
-          <span id="weather-icon">🌧️</span>
-          <span id="weather-name">Lluvia Suave</span>
-        </div>
-        <button id="btn-speed" class="btn-pill btn-subtle" title="Cambiar ritmo de juego (Normal / Express)">
-          ⏳ Ritmo: Cálido
-        </button>
-        <button id="btn-sound" class="btn-pill" title="Activar sonido ambiental de lluvia">
-          🌧️ Lluvia: OFF
-        </button>
-        <button id="btn-reset" class="btn-pill btn-subtle" title="Reiniciar partida">
-          🔄
-        </button>
-      </div>
-    </header>
-
-    <!-- Marcador Central de Recursos -->
-    <section class="resource-banner">
-      <div class="counter-box">
-        <span class="resource-icon">🫐</span>
-        <div class="counter-data">
-          <div class="counter-number" id="maquis-count">0</div>
-          <div class="counter-rate">
-            <span id="maquis-rate">0/seg</span>
-            <span id="luck-indicator" class="luck-badge hidden">✨ Suerte x3</span>
-            <span id="pet-indicator" class="pet-badge hidden">💖 ¡Pudús Felices!</span>
+  <div id="app" class="game-layout">
+    
+    <!-- ====================================================================
+         LADO IZQUIERDO: Menú Desplegable de Mejoras y Gestión del Refugio
+         ==================================================================== -->
+    <aside id="sidebar-menu" class="sidebar">
+      <!-- Encabezado de la barra lateral -->
+      <div class="sidebar-header">
+        <div class="brand">
+          <span class="brand-icon">🦌</span>
+          <div class="brand-text">
+            <h2>El Refugio</h2>
+            <p class="subtitle">Bosque Valdiviano</p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Área Visual: Diorama del Bosque y Arbusto Interactivo -->
-    <main class="diorama-container">
-      <canvas id="diorama-canvas"></canvas>
-      <div class="diorama-hint">
-        <span>Toca el arbusto para bayas • ¡Acaricia a los pudús para hacerlos felices! 💕</span>
+        <button id="btn-toggle-sidebar" class="btn-icon" title="Ocultar o desplegar menú">
+          <span class="toggle-arrow">◀</span>
+        </button>
       </div>
 
-      <!-- Cuadro Especial de Fase 1: Conocer al primer Pudú -->
+      <!-- Resumen Compacto de Recursos en el Menú -->
+      <div class="sidebar-resource-card">
+        <div class="resource-row">
+          <span class="resource-icon">🫐</span>
+          <div class="resource-data">
+            <span class="resource-label">Maquis Cosechados</span>
+            <div class="resource-val" id="maquis-count">0</div>
+          </div>
+        </div>
+        <div class="resource-subrow">
+          <span class="rate-badge" id="maquis-rate">0/seg</span>
+          <div id="weather-badge" class="weather-pill" title="Clima actual">
+            <span id="weather-icon">🌧️</span>
+            <span id="weather-name">Lluvia Suave</span>
+          </div>
+        </div>
+        <div class="controls-row">
+          <button id="btn-speed" class="pill-btn" title="Cambiar ritmo de juego">
+            ⏳ Ritmo: Cálido
+          </button>
+          <button id="btn-sound" class="pill-btn" title="Activar sonido ambiental">
+            🌧️ Lluvia: OFF
+          </button>
+        </div>
+      </div>
+
+      <!-- Pestañas de Navegación del Menú Izquierdo -->
+      <nav class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="cosecha">
+          <span class="tab-icon">🌾</span> Cosecha
+        </button>
+        <button class="tab-btn" data-tab="refugio">
+          <span class="tab-icon">🦌</span> Refugio
+        </button>
+        <button class="tab-btn" data-tab="taller">
+          <span class="tab-icon">🏺</span> Taller
+        </button>
+        <button class="tab-btn" data-tab="bitacora">
+          <span class="tab-icon">📜</span> Bitácora
+        </button>
+      </nav>
+
+      <!-- Paneles con Scroll de Mejoras -->
+      <div class="sidebar-content">
+        <!-- Pestaña 1: Cosecha y Productores -->
+        <div id="tab-cosecha" class="tab-content">
+          <div id="tab-cosecha-list" class="cards-list"></div>
+        </div>
+
+        <!-- Pestaña 2: El Refugio de Pudús y Mejoras -->
+        <div id="tab-refugio" class="tab-content hidden">
+          <div id="tab-refugio-list"></div>
+        </div>
+
+        <!-- Pestaña 3: El Taller Austral -->
+        <div id="tab-taller" class="tab-content hidden">
+          <div id="tab-taller-content"></div>
+        </div>
+
+        <!-- Pestaña 4: Bitácora del Bosque y Enciclopedia Didáctica -->
+        <div id="tab-bitacora" class="tab-content hidden">
+          <div id="tab-bitacora-content"></div>
+        </div>
+      </div>
+
+      <!-- Pie de la barra lateral: Reset y estado -->
+      <div class="sidebar-footer">
+        <button id="btn-reset" class="btn-subtle" title="Reiniciar partida">
+          🔄 Reiniciar partida
+        </button>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         LADO DERECHO: Mundo Visual Pixel Art Principal
+         ==================================================================== -->
+    <main id="game-viewport" class="game-viewport">
+      <!-- Botón flotante para reabrir el menú si está plegado -->
+      <button id="btn-open-sidebar" class="floating-menu-btn hidden" title="Abrir menú de mejoras">
+        <span class="menu-icon">☰</span>
+        <span class="menu-label">Mejoras & Refugio</span>
+      </button>
+
+      <!-- Indicadores de Estado Activos (Suerte, Caricias) -->
+      <div class="viewport-hud">
+        <div id="luck-indicator" class="hud-badge luck-badge hidden">
+          ✨ ¡Suerte del Chucao x3!
+        </div>
+        <div id="pet-indicator" class="hud-badge pet-badge hidden">
+          💖 ¡Manada Feliz! +25%
+        </div>
+      </div>
+
+      <!-- Canvas Pixel Art del Bosque y los Pudús -->
+      <div class="canvas-wrapper">
+        <canvas id="diorama-canvas"></canvas>
+      </div>
+
+      <!-- Pistas de interacción visual -->
+      <div class="world-action-bar">
+        <div class="action-hint">
+          🌲 Toca el maqui central para cosechar • 🐾 Haz clic en un pudú para acariciarlo • 🫐 Recoge las bayas caídas
+        </div>
+      </div>
+
+      <!-- Cuadro de Fase 1: Conocer al primer pudú Pichi -->
       <div id="box-fase-1" class="phase-card">
         <div class="phase-card-inner">
           <div class="phase-avatar">🦌</div>
           <div class="phase-content">
             <h4>¡Un pudú tímido se asoma entre las hojas!</h4>
-            <p>Se llama Pichi y tiene frío. Ofrécele maquis para ganarte su cariño y bienvenida.</p>
+            <p>Se llama Pichi y tiene frío. Ofrécele maquis para ganarte su confianza.</p>
             <div class="progress-bar-bg">
               <div id="pudu-confianza-bar" class="progress-bar-fill" style="width: 0%;"></div>
             </div>
@@ -78,44 +154,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Panel Inferior: Pestañas de Progresión -->
-    <nav class="tabs-nav">
-      <button class="tab-btn active" data-tab="cosecha">
-        <span class="tab-icon">🌾</span> Cosecha
-      </button>
-      <button class="tab-btn" data-tab="refugio">
-        <span class="tab-icon">🦌</span> El Refugio
-      </button>
-      <button class="tab-btn" data-tab="taller">
-        <span class="tab-icon">🏺</span> El Taller
-      </button>
-      <button class="tab-btn" data-tab="bitacora">
-        <span class="tab-icon">📜</span> Bitácora & Flora/Fauna
-      </button>
-    </nav>
-
-    <section class="tab-panels">
-      <!-- Pestaña 1: Cosecha y Productores -->
-      <div id="tab-cosecha" class="tab-content">
-        <div id="tab-cosecha-list" class="cards-list"></div>
-      </div>
-
-      <!-- Pestaña 2: El Refugio de Pudús y Mejoras -->
-      <div id="tab-refugio" class="tab-content hidden">
-        <div id="tab-refugio-list"></div>
-      </div>
-
-      <!-- Pestaña 3: El Taller Austral -->
-      <div id="tab-taller" class="tab-content hidden">
-        <div id="tab-taller-content"></div>
-      </div>
-
-      <!-- Pestaña 4: Bitácora del Bosque y Enciclopedia Didáctica -->
-      <div id="tab-bitacora" class="tab-content hidden">
-        <div id="tab-bitacora-content"></div>
-      </div>
-    </section>
   </div>
 
   <!-- Contenedor de Notificaciones Flotantes (Toasts) -->
@@ -137,9 +175,7 @@
           <span class="flower-deco">🌸</span>
         </div>
         
-        <div class="letter-body" id="carta-parrafos">
-          <!-- Párrafos inyectados dinámicamente -->
-        </div>
+        <div class="letter-body" id="carta-parrafos"></div>
 
         <div class="letter-footer">
           <p id="carta-despedida">Con todo mi cariño,</p>

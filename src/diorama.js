@@ -1,8 +1,26 @@
 /**
- * Diorama Visual Interactivo en HTML5 Canvas con Física Táctil y Ambiente Vivo
- * Renderiza el claro del bosque, el arbusto de maqui elástico, bayas físicas en el suelo,
- * pudús con IA de recolección y sistema de caricias, amigos del bosque y clima cambiante.
+ * Motor del Mundo y Diorama en Pixel Art para "El Refugio de los Pudús"
+ * Renderiza el claro del bosque en resolución pixel-perfect con sprites procedurales,
+ * animaciones de trote, sueño, recolección, arroyo animado, olla de greda y clima.
  */
+
+import {
+  PALETTE,
+  drawPixelMatrix,
+  PUDU_FRAMES,
+  PUDU_COLOR_MAP,
+  CHUCAO_SPRITES,
+  CHUCAO_COLOR_MAP,
+  MONITO_SPRITE,
+  MONITO_COLOR_MAP,
+  MOSS_BED_SPRITE,
+  MOSS_BED_COLOR_MAP,
+  CLAY_POT_SPRITE,
+  CLAY_POT_COLOR_MAP,
+  SPROUT_SPRITE,
+  SPROUT_COLOR_MAP,
+  ACCESSORY_SPRITES
+} from './pixelRenderer.js';
 
 export class ForestDiorama {
   constructor(canvasElement, state, sound) {
@@ -11,171 +29,190 @@ export class ForestDiorama {
     this.state = state;
     this.sound = sound;
 
-    this.width = canvasElement.width = canvasElement.offsetWidth || 600;
-    this.height = canvasElement.height = canvasElement.offsetHeight || 380;
+    // Buffer interno de baja resolución para estética Pixel Art retro nítida
+    this.virtualWidth = 380;
+    this.virtualHeight = 220;
+    this.offscreenCanvas = document.createElement('canvas');
+    this.offscreenCanvas.width = this.virtualWidth;
+    this.offscreenCanvas.height = this.virtualHeight;
+    this.vCtx = this.offscreenCanvas.getContext('2d');
+    this.vCtx.imageSmoothingEnabled = false;
 
-    // Partículas climáticas (lluvia, hojas de viento, brillos de sol)
-    this.raindrops = [];
-    this.leaves = [];
-    this.sunbeams = [];
-    this.initWeatherParticles();
+    // Configurar canvas principal
+    this.handleResize();
 
-    // Partículas de click y textos flotantes
-    this.floatingTexts = [];
-    this.clickParticles = [];
-
-    // Bayas físicas caídas en el suelo que los pudús pueden recoger
-    this.groundBerries = [];
-
-    // Pudús animados en el refugio
+    // Entidades del mundo
     this.pudusVisuales = [];
     this.initPudus();
 
-    // Rebote elástico del arbusto central
+    // Bayas caídas con física en el suelo
+    this.groundBerries = [];
+
+    // Partículas pixel (humo, lluvia, hojas, corazones, textos flotantes)
+    this.pixelParticles = [];
+    this.floatingTexts = [];
+    this.raindrops = [];
+    this.leaves = [];
+    this.initWeather();
+
+    // Rebote elástico del arbusto
     this.bushScale = 1;
     this.bushVelocity = 0;
 
-    // Humo procedural de la olla de greda
-    this.smokeParticles = [];
+    // Temporizador de animación de agua y fuego
+    this.waterAnimTimer = 0;
+    this.fireAnimFrame = 0;
 
     window.addEventListener('resize', () => this.handleResize());
   }
 
   handleResize() {
     if (!this.canvas) return;
-    this.width = this.canvas.width = this.canvas.offsetWidth;
-    this.height = this.canvas.height = this.canvas.offsetHeight;
-    this.initWeatherParticles();
+    this.canvas.width = this.canvas.offsetWidth;
+    this.canvas.height = this.canvas.offsetHeight;
+    this.ctx.imageSmoothingEnabled = false;
   }
 
-  initWeatherParticles() {
-    // 1. Lluvia
+  initWeather() {
     this.raindrops = [];
-    const dropCount = Math.floor(this.width / 14);
-    for (let i = 0; i < dropCount; i++) {
+    for (let i = 0; i < 40; i++) {
       this.raindrops.push({
-        x: Math.random() * this.width,
-        y: Math.random() * this.height,
-        speed: 5 + Math.random() * 5,
-        length: 10 + Math.random() * 12,
-        alpha: 0.15 + Math.random() * 0.25
+        x: Math.random() * this.virtualWidth,
+        y: Math.random() * this.virtualHeight,
+        speed: 3 + Math.random() * 3,
+        length: 4 + Math.random() * 4
       });
     }
 
-    // 2. Hojas otoñales arrastradas por el viento
     this.leaves = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 14; i++) {
       this.leaves.push({
-        x: Math.random() * this.width,
-        y: Math.random() * this.height,
-        vx: 1.5 + Math.random() * 2.5,
-        vy: 0.8 + Math.random() * 1.5,
-        rot: Math.random() * Math.PI,
-        vrot: (Math.random() - 0.5) * 0.05,
-        color: ['#c25927', '#d97d29', '#e0a93b', '#8f3e23'][Math.floor(Math.random() * 4)],
-        size: 5 + Math.random() * 4
+        x: Math.random() * this.virtualWidth,
+        y: Math.random() * this.virtualHeight,
+        vx: 1 + Math.random() * 1.5,
+        vy: 0.6 + Math.random() * 1,
+        color: ['#c25927', '#d97d29', '#e0a93b'][Math.floor(Math.random() * 3)]
       });
     }
   }
 
   initPudus() {
     this.pudusVisuales = [];
-    const count = Math.min(7, Math.max(1, this.state.data.pudus.length));
+    const count = Math.min(8, Math.max(1, this.state.data.pudus.length));
     for (let i = 0; i < count; i++) {
       const pData = this.state.data.pudus[i];
       this.pudusVisuales.push({
         id: pData ? pData.id : `p_${i}`,
         nombre: pData ? pData.nombre : `Pudú ${i + 1}`,
-        x: 40 + Math.random() * (this.width - 80),
-        y: this.height - 48 - (i % 3) * 12,
-        baseY: this.height - 48 - (i % 3) * 12,
-        vx: (Math.random() - 0.5) * 0.7,
+        x: 40 + (i * 38) % (this.virtualWidth - 80),
+        y: this.virtualHeight - 42 - (i % 2) * 14,
+        baseY: this.virtualHeight - 42 - (i % 2) * 14,
+        vx: (Math.random() - 0.5) * 0.45,
         direction: Math.random() > 0.5 ? 1 : -1,
-        bounceTimer: Math.random() * 10,
-        hat: pData ? (pData.sombrero || "🍂") : "🍂",
-        isPetting: false,
-        pettingTimer: 0,
+        state: 'idle', // 'idle' | 'walk' | 'eat' | 'sleep' | 'pet'
+        frameTimer: Math.random() * 10,
+        petTimer: 0,
+        sleepTimer: 0,
+        eatTimer: 0,
         targetBerry: null,
-        gatherCooldown: 0
+        hat: this.getHatKey(pData?.sombrero)
       });
     }
   }
 
-  // Click manual en el arbusto central
-  triggerBushClick(e) {
-    this.bushScale = 0.86;
+  getHatKey(sombrero) {
+    if (sombrero === "🌸" || sombrero === "🎀") return "copihue";
+    if (sombrero === "☀️" || sombrero === "🌾") return "chupalla";
+    if (sombrero === "🧣" || sombrero === "🔥") return "scarf";
+    return "leaf"; // por defecto hoja verde
+  }
+
+  // Conversión de coordenadas de pantalla a espacio virtual del juego
+  screenToVirtual(screenX, screenY) {
+    const scaleX = this.virtualWidth / this.canvas.width;
+    const scaleY = this.virtualHeight / this.canvas.height;
+    return {
+      x: screenX * scaleX,
+      y: screenY * scaleY
+    };
+  }
+
+  // Clic en el arbusto central
+  triggerBushClick(screenEvent) {
+    this.bushScale = 0.85;
     this.sound.playBerryPop();
 
-    const rect = this.canvas.getBoundingClientRect();
-    const clickX = e ? e.clientX - rect.left : this.width / 2;
-    const clickY = e ? e.clientY - rect.top : this.height * 0.44;
+    let vx = this.virtualWidth / 2;
+    let vy = this.virtualHeight * 0.42;
 
-    // 1. Partículas visuales inmediatas
-    for (let i = 0; i < 5; i++) {
-      this.clickParticles.push({
-        x: clickX + (Math.random() - 0.5) * 35,
-        y: clickY + (Math.random() - 0.5) * 35,
-        vx: (Math.random() - 0.5) * 4,
-        vy: -3 - Math.random() * 3.5,
-        size: 5 + Math.random() * 3,
-        alpha: 1,
-        color: Math.random() > 0.3 ? '#421448' : '#692073'
-      });
+    if (screenEvent) {
+      const rect = this.canvas.getBoundingClientRect();
+      const coords = this.screenToVirtual(screenEvent.clientX - rect.left, screenEvent.clientY - rect.top);
+      vx = coords.x;
+      vy = coords.y;
     }
 
-    // 2. Generar bayas físicas que caen al suelo para que los pudús las recojan
-    if (this.groundBerries.length < 15) {
+    // Soltar bayas físicas al suelo
+    if (this.groundBerries.length < 18) {
       this.groundBerries.push({
-        x: this.width / 2 + (Math.random() - 0.5) * 100,
-        y: this.height * 0.46,
-        vy: 2 + Math.random() * 3,
-        targetY: this.height - 35 - Math.random() * 25,
-        rot: Math.random() * Math.PI,
-        size: 6,
+        x: this.virtualWidth / 2 + (Math.random() - 0.5) * 70,
+        y: this.virtualHeight * 0.45,
+        vy: 1.5 + Math.random() * 2,
+        targetY: this.virtualHeight - 32 - Math.random() * 20,
         collected: false
       });
     }
 
-    // 3. Texto flotante con ganancia
+    // Partículas de jugo de maqui
+    for (let i = 0; i < 4; i++) {
+      this.pixelParticles.push({
+        x: vx + (Math.random() - 0.5) * 16,
+        y: vy + (Math.random() - 0.5) * 16,
+        vx: (Math.random() - 0.5) * 2,
+        vy: -1.5 - Math.random() * 2,
+        color: PALETTE.berryLight,
+        life: 0.8
+      });
+    }
+
     const ganancia = this.state.getMaquisPorClick();
-    this.addFloatingText(`+${ganancia}`, clickX, clickY - 15, '#fef08a');
+    this.addFloatingText(`+${ganancia}`, vx, vy - 10, '#fef08a');
   }
 
-  // Acariciar a un pudú
+  // Acariciar pudú
   petPudu(pudu) {
-    pudu.isPetting = true;
-    pudu.pettingTimer = 1.2;
+    pudu.state = 'pet';
+    pudu.petTimer = 1.4;
     this.sound.playPetHeart();
     this.sound.playPuduHappy();
 
-    // Activar bono de caricia en el estado (+25% por 20 segundos)
     const s = this.state.data;
     s.caricias.contadorTotal++;
     s.caricias.segundosBonoCaricia = 20;
     s.caricias.multiplicadorCaricia = 1.25;
 
-    // Partículas de corazones flotantes
-    for (let i = 0; i < 4; i++) {
-      this.floatingTexts.push({
-        text: '❤️',
-        x: pudu.x + (Math.random() - 0.5) * 20,
-        y: pudu.y - 15,
-        vy: -1.4 - Math.random() * 1.2,
-        alpha: 1,
-        size: 15,
-        color: '#f43f5e'
+    // Corazones pixel flotantes
+    for (let i = 0; i < 3; i++) {
+      this.pixelParticles.push({
+        x: pudu.x + (Math.random() - 0.5) * 12,
+        y: pudu.y - 8,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: -1 - Math.random() * 0.6,
+        color: '#f43f5e',
+        isHeart: true,
+        life: 1.2
       });
     }
 
-    this.addFloatingText("¡Pudú regalón! +25% velocidad", pudu.x, pudu.y - 30, '#f472b6', 13);
+    this.addFloatingText("¡Pudú feliz! 💕", pudu.x + 8, pudu.y - 12, '#f472b6', 10);
   }
 
-  addFloatingText(text, x, y, color = '#ffffff', size = 14) {
+  addFloatingText(text, x, y, color = '#ffffff', size = 9) {
     this.floatingTexts.push({
       text,
-      x,
-      y,
-      vy: -1.2,
+      x: Math.floor(x),
+      y: Math.floor(y),
+      vy: -0.6,
       alpha: 1,
       size,
       color
@@ -185,39 +222,42 @@ export class ForestDiorama {
   update(dt) {
     const s = this.state.data;
 
-    // Sincronizar pudús si se unieron nuevos habitantes
-    if (this.pudusVisuales.length !== Math.min(7, s.pudus.length)) {
+    // Sincronizar pudús si se agregaron
+    if (this.pudusVisuales.length !== Math.min(8, s.pudus.length)) {
       this.initPudus();
     }
 
-    // 1. Física de resorte del arbusto
-    const k = 0.22;
-    const damping = 0.8;
+    // Física de rebote del arbusto
+    const k = 0.24;
+    const damping = 0.78;
     const displacement = 1 - this.bushScale;
     this.bushVelocity += displacement * k;
     this.bushVelocity *= damping;
     this.bushScale += this.bushVelocity;
 
-    // 2. Clima: actualizar partículas
+    // Temporizadores de agua y fuego
+    this.waterAnimTimer += dt * 3;
+    this.fireAnimFrame = (this.fireAnimFrame + dt * 6) % 2;
+
+    // 1. Clima pixel
     if (s.clima.tipo === 'lluvia_suave') {
       for (const drop of this.raindrops) {
         drop.y += drop.speed;
-        if (drop.y > this.height) {
-          drop.y = -10;
-          drop.x = Math.random() * this.width;
+        if (drop.y > this.virtualHeight) {
+          drop.y = -6;
+          drop.x = Math.random() * this.virtualWidth;
         }
       }
     } else if (s.clima.tipo === 'viento_hojarasca') {
       for (const leaf of this.leaves) {
         leaf.x += leaf.vx;
         leaf.y += leaf.vy;
-        leaf.rot += leaf.vrot;
-        if (leaf.x > this.width + 20) leaf.x = -20;
-        if (leaf.y > this.height) leaf.y = -10;
+        if (leaf.x > this.virtualWidth + 10) leaf.x = -10;
+        if (leaf.y > this.virtualHeight) leaf.y = -6;
       }
     }
 
-    // 3. Bayas en el suelo (caída con gravedad)
+    // 2. Caída de bayas físicas
     for (const b of this.groundBerries) {
       if (b.y < b.targetY) {
         b.y += b.vy;
@@ -225,561 +265,408 @@ export class ForestDiorama {
       }
     }
 
-    // 4. Actualizar Pudús e IA de recolección de bayas
+    // 3. IA de comportamiento de Pudús
     for (const pudu of this.pudusVisuales) {
-      pudu.bounceTimer += dt * 4;
+      pudu.frameTimer += dt * 3.5;
 
-      // Temporizador de caricia
-      if (pudu.isPetting) {
-        pudu.pettingTimer -= dt;
-        if (pudu.pettingTimer <= 0) pudu.isPetting = false;
+      // Estado Petting
+      if (pudu.state === 'pet') {
+        pudu.petTimer -= dt;
+        if (pudu.petTimer <= 0) pudu.state = 'idle';
+        continue;
       }
 
-      // Si hay bayas en el suelo, buscar la más cercana
+      // Estado Comiendo
+      if (pudu.state === 'eat') {
+        pudu.eatTimer -= dt;
+        if (pudu.eatTimer <= 0) pudu.state = 'idle';
+        continue;
+      }
+
+      // Estado Durmiendo
+      if (pudu.state === 'sleep') {
+        pudu.sleepTimer -= dt;
+        if (pudu.sleepTimer <= 0) pudu.state = 'idle';
+        continue;
+      }
+
+      // Buscar bayas en el suelo si hay alguna libre
       if (this.groundBerries.length > 0 && !pudu.targetBerry) {
         const available = this.groundBerries.filter(b => !b.claimed);
         if (available.length > 0) {
-          const closest = available[0];
-          closest.claimed = true;
-          pudu.targetBerry = closest;
+          const target = available[0];
+          target.claimed = true;
+          pudu.targetBerry = target;
         }
       }
 
-      // Caminar hacia la baya o patrullar
       if (pudu.targetBerry) {
+        pudu.state = 'walk';
         const dx = pudu.targetBerry.x - pudu.x;
         pudu.direction = dx >= 0 ? 1 : -1;
-        pudu.x += Math.sign(dx) * 1.1;
+        pudu.x += Math.sign(dx) * 0.75;
 
-        if (Math.abs(dx) < 8) {
-          // Baya recogida por el pudú
-          const bIdx = this.groundBerries.indexOf(pudu.targetBerry);
-          if (bIdx !== -1) {
-            this.groundBerries.splice(bIdx, 1);
-          }
+        if (Math.abs(dx) < 6) {
+          // Llegó a la baya
+          const idx = this.groundBerries.indexOf(pudu.targetBerry);
+          if (idx !== -1) this.groundBerries.splice(idx, 1);
           pudu.targetBerry = null;
+          pudu.state = 'eat';
+          pudu.eatTimer = 1.0;
 
-          const bonoBaya = Math.max(1, Math.round(this.state.getMaquisPorClick() * 0.6));
+          const bonoBaya = Math.max(1, Math.round(this.state.getMaquisPorClick() * 0.5));
           s.maquis += bonoBaya;
           s.totalMaquis += bonoBaya;
-          this.addFloatingText(`+${bonoBaya} 🫐`, pudu.x, pudu.y - 14, '#c084fc', 12);
+          this.addFloatingText(`+${bonoBaya} 🫐`, pudu.x + 8, pudu.y - 8, '#c084fc', 8);
           this.sound.playPuduHappy();
         }
       } else {
-        // Movimiento normal
-        pudu.x += pudu.vx;
-        if (pudu.x < 30) {
-          pudu.x = 30;
-          pudu.vx = Math.abs(pudu.vx);
-          pudu.direction = 1;
-        } else if (pudu.x > this.width - 50) {
-          pudu.x = this.width - 50;
-          pudu.vx = -Math.abs(pudu.vx);
-          pudu.direction = -1;
+        // Paseo / Idle / Dormir ocasional en camita
+        if (Math.random() < 0.003 && s.productores.camitaMusgo.cantidad > 0) {
+          pudu.state = 'sleep';
+          pudu.sleepTimer = 6.0;
+        } else if (Math.random() < 0.008) {
+          pudu.vx = (Math.random() - 0.5) * 0.5;
+          pudu.direction = pudu.vx >= 0 ? 1 : -1;
+          pudu.state = Math.abs(pudu.vx) > 0.05 ? 'walk' : 'idle';
         }
 
-        if (Math.random() < 0.006) {
-          pudu.vx = (Math.random() - 0.5) * 0.8;
-          pudu.direction = pudu.vx >= 0 ? 1 : -1;
+        if (pudu.state === 'walk') {
+          pudu.x += pudu.vx;
+          if (pudu.x < 24) {
+            pudu.x = 24;
+            pudu.vx = Math.abs(pudu.vx);
+            pudu.direction = 1;
+          } else if (pudu.x > this.virtualWidth - 36) {
+            pudu.x = this.virtualWidth - 36;
+            pudu.vx = -Math.abs(pudu.vx);
+            pudu.direction = -1;
+          }
         }
       }
     }
 
-    // 5. Partículas de click
-    for (let i = this.clickParticles.length - 1; i >= 0; i--) {
-      const p = this.clickParticles[i];
+    // 4. Partículas
+    for (let i = this.pixelParticles.length - 1; i >= 0; i--) {
+      const p = this.pixelParticles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.16; // Gravedad
-      p.alpha -= 0.025;
-      if (p.alpha <= 0) this.clickParticles.splice(i, 1);
+      p.life -= dt;
+      if (p.life <= 0) this.pixelParticles.splice(i, 1);
     }
 
-    // 6. Textos flotantes
+    // 5. Textos flotantes
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
       const ft = this.floatingTexts[i];
       ft.y += ft.vy;
-      ft.alpha -= 0.02;
+      ft.alpha -= dt * 0.9;
       if (ft.alpha <= 0) this.floatingTexts.splice(i, 1);
-    }
-
-    // 7. Humo de la olla de greda si ya está construida
-    if (s.productores.ollaGreda.cantidad > 0) {
-      if (Math.random() < 0.2) {
-        this.smokeParticles.push({
-          x: this.width - 65,
-          y: this.height - 65,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: -0.8 - Math.random() * 0.6,
-          size: 4 + Math.random() * 3,
-          alpha: 0.6
-        });
-      }
-      for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
-        const sm = this.smokeParticles[i];
-        sm.x += sm.vx;
-        sm.y += sm.vy;
-        sm.size += 0.08;
-        sm.alpha -= 0.012;
-        if (sm.alpha <= 0) this.smokeParticles.splice(i, 1);
-      }
     }
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    const vCtx = this.vCtx;
     const s = this.state.data;
 
-    // 1. Cielo atmosférico según el clima
-    this.drawSkyAtmosphere();
+    // Limpiar canvas virtual
+    vCtx.clearRect(0, 0, this.virtualWidth, this.virtualHeight);
 
-    // 2. Bosque y follaje de fondo
-    this.drawForestBackground();
+    // 1. Cielo degradado pixel
+    this.drawPixelSky(vCtx);
 
-    // 3. Elementos construidos del refugio (Arroyo de acequia, camitas, olla de greda)
-    this.drawCampElements();
+    // 2. Siluetas de árboles y montañas lejanas
+    this.drawPixelMountainsAndTrees(vCtx);
 
-    // 4. Suelo de tierra húmeda y musgo
-    this.drawGround();
+    // 3. Suelo boscoso (Tierra y alfombra de musgo)
+    this.drawPixelGround(vCtx);
 
-    // 5. Clima: lluvia / hojas / sol
-    this.drawWeatherEffects();
-
-    // 6. Bayas en el suelo
-    this.drawGroundBerries();
-
-    // 7. El Arbusto Central de Maqui
-    this.drawCentralBush();
-
-    // 8. Pudús caminando y recogiendo
-    this.drawPudus();
-
-    // 9. Fauna especial: Monito del Monte en las ramas
-    if (s.productores.monitoMonte.cantidad > 0) {
-      this.drawMonitoDelMonte();
-    }
-
-    // 10. Chucao volando si está activo
-    this.drawChucao();
-
-    // 11. Partículas y textos flotantes
-    this.drawParticlesAndTexts();
-  }
-
-  drawSkyAtmosphere() {
-    const s = this.state.data;
-    const skyGrad = this.ctx.createLinearGradient(0, 0, 0, this.height);
-
-    if (s.clima.tipo === 'arcoiris_sol') {
-      skyGrad.addColorStop(0, '#2e5b42');
-      skyGrad.addColorStop(0.5, '#4a7c59');
-      skyGrad.addColorStop(1, '#689d71');
-    } else if (s.clima.tipo === 'viento_hojarasca') {
-      skyGrad.addColorStop(0, '#2d4233');
-      skyGrad.addColorStop(0.6, '#3e5443');
-      skyGrad.addColorStop(1, '#4f6853');
-    } else {
-      // Lluvia suave por defecto
-      skyGrad.addColorStop(0, '#1a3324');
-      skyGrad.addColorStop(0.6, '#264431');
-      skyGrad.addColorStop(1, '#325239');
-    }
-
-    this.ctx.fillStyle = skyGrad;
-    this.ctx.fillRect(0, 0, this.width, this.height);
-
-    // Si hay arcoíris con sol
-    if (s.clima.tipo === 'arcoiris_sol') {
-      this.ctx.save();
-      this.ctx.lineWidth = 12;
-      this.ctx.globalAlpha = 0.22;
-      const arcColors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa'];
-      arcColors.forEach((color, idx) => {
-        this.ctx.strokeStyle = color;
-        this.ctx.beginPath();
-        this.ctx.arc(this.width * 0.8, this.height + 60, this.height * 0.85 + (idx * 6), Math.PI, Math.PI * 1.6);
-        this.ctx.stroke();
-      });
-      this.ctx.restore();
-    }
-  }
-
-  drawForestBackground() {
-    this.ctx.save();
-    this.ctx.fillStyle = 'rgba(14, 32, 19, 0.42)';
-    // Troncos y siluetas lejanas
-    for (let x = 25; x < this.width; x += 95) {
-      this.ctx.fillRect(x, 0, 22, this.height * 0.76);
-    }
-    // Niebla tenue
-    const mistGrad = this.ctx.createLinearGradient(0, this.height * 0.35, 0, this.height * 0.75);
-    mistGrad.addColorStop(0, 'rgba(215, 235, 225, 0.08)');
-    mistGrad.addColorStop(1, 'rgba(215, 235, 225, 0.01)');
-    this.ctx.fillStyle = mistGrad;
-    this.ctx.fillRect(0, 0, this.width, this.height);
-    this.ctx.restore();
-  }
-
-  drawCampElements() {
-    const s = this.state.data;
-
-    // 1. Arroyo cristalino de la acequia de deshielo
+    // 4. Acequia de Deshielo si está comprada
     if (s.productores.canaletaDeshielo.cantidad > 0) {
-      this.ctx.save();
-      this.ctx.strokeStyle = 'rgba(125, 211, 252, 0.45)';
-      this.ctx.lineWidth = 14;
-      this.ctx.lineCap = 'round';
-      this.ctx.beginPath();
-      this.ctx.moveTo(0, this.height - 22);
-      this.ctx.bezierCurveTo(this.width * 0.3, this.height - 18, this.width * 0.7, this.height - 28, this.width, this.height - 24);
-      this.ctx.stroke();
-
-      // Reflejos del agua
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      this.ctx.lineWidth = 3;
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.width * 0.2, this.height - 20);
-      this.ctx.lineTo(this.width * 0.4, this.height - 22);
-      this.ctx.stroke();
-      this.ctx.restore();
+      this.drawPixelStream(vCtx);
     }
 
-    // 2. Camitas de musgo construidas
+    // 5. Camitas de musgo construidas
     const camas = Math.min(4, s.productores.camitaMusgo.cantidad);
     for (let i = 0; i < camas; i++) {
-      const cx = 35 + i * 38;
-      const cy = this.height - 40;
-      this.ctx.save();
-      this.ctx.fillStyle = '#2f5a34';
-      this.ctx.beginPath();
-      this.ctx.ellipse(cx, cy, 14, 6, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-      this.ctx.fillStyle = '#e2b347'; // Hoja seca como cojín
-      this.ctx.beginPath();
-      this.ctx.arc(cx - 2, cy - 2, 4, 0, Math.PI * 2);
-      this.ctx.fill();
-      this.ctx.restore();
+      const cx = 30 + i * 36;
+      const cy = this.virtualHeight - 48;
+      drawPixelMatrix(vCtx, MOSS_BED_SPRITE, MOSS_BED_COLOR_MAP, cx, cy, 1);
     }
 
-    // 3. Cocinilla y Olla de Greda
+    // 6. Brotes de Maqui plantados
+    const brotes = Math.min(8, s.productores.broteMaqui.cantidad);
+    for (let i = 0; i < brotes; i++) {
+      const bx = 18 + (i * 44) % (this.virtualWidth - 50);
+      const by = this.virtualHeight - 52 - (i % 2) * 8;
+      drawPixelMatrix(vCtx, SPROUT_SPRITE, SPROUT_COLOR_MAP, bx, by, 1);
+    }
+
+    // 7. Olla de Greda con fuego animado
     if (s.productores.ollaGreda.cantidad > 0) {
-      const ox = this.width - 65;
-      const oy = this.height - 50;
+      const ox = this.virtualWidth - 44;
+      const oy = this.virtualHeight - 54;
+      drawPixelMatrix(vCtx, CLAY_POT_SPRITE, CLAY_POT_COLOR_MAP, ox, oy, 1);
+    }
 
-      this.ctx.save();
-      // Olla de greda rústica
-      this.ctx.fillStyle = '#a0522d';
-      this.ctx.beginPath();
-      this.ctx.arc(ox, oy, 11, 0, Math.PI * 2);
-      this.ctx.fill();
+    // 8. Bayas en el suelo
+    for (const b of this.groundBerries) {
+      vCtx.fillStyle = PALETTE.berryMid;
+      vCtx.fillRect(Math.floor(b.x), Math.floor(b.y), 3, 3);
+      vCtx.fillStyle = PALETTE.berryGlint;
+      vCtx.fillRect(Math.floor(b.x), Math.floor(b.y), 1, 1);
+    }
 
-      this.ctx.fillStyle = '#78350f';
-      this.ctx.fillRect(ox - 9, oy - 14, 18, 5);
+    // 9. Arbusto Central de Maqui (Pixel Art con rebote)
+    this.drawPixelCentralBush(vCtx);
 
-      // Partículas de humo
-      for (const sm of this.smokeParticles) {
-        this.ctx.fillStyle = `rgba(240, 240, 240, ${sm.alpha})`;
-        this.ctx.beginPath();
-        this.ctx.arc(sm.x, sm.y, sm.size, 0, Math.PI * 2);
-        this.ctx.fill();
-      }
-      this.ctx.restore();
+    // 10. Pudús en Pixel Art
+    this.drawPixelPudus(vCtx);
+
+    // 11. Monito del Monte en la rama
+    if (s.productores.monitoMonte.cantidad > 0) {
+      this.drawPixelMonito(vCtx);
+    }
+
+    // 12. Chucao volando
+    if (s.chucao.activo) {
+      this.drawPixelChucao(vCtx);
+    }
+
+    // 13. Clima y partículas
+    this.drawPixelWeather(vCtx);
+
+    // 14. Textos flotantes
+    this.drawPixelTexts(vCtx);
+
+    // Renderizar buffer virtual escalado en el canvas visible
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.drawImage(
+      this.offscreenCanvas,
+      0, 0, this.virtualWidth, this.virtualHeight,
+      0, 0, this.canvas.width, this.canvas.height
+    );
+  }
+
+  drawPixelSky(ctx) {
+    const s = this.state.data;
+    const skyColors = s.clima.tipo === 'arcoiris_sol'
+      ? ['#2f5e43', '#3d7756', '#52966e', '#72b68e']
+      : (s.clima.tipo === 'viento_hojarasca'
+        ? ['#223a2d', '#2d4b3b', '#3b5f4c', '#4b755e']
+        : ['#172e21', '#1f3d2c', '#294d38', '#345e46']);
+
+    const bandH = Math.floor(this.virtualHeight * 0.6 / skyColors.length);
+    skyColors.forEach((col, i) => {
+      ctx.fillStyle = col;
+      ctx.fillRect(0, i * bandH, this.virtualWidth, bandH + 2);
+    });
+
+    // Arcoíris pixel si hay llovizna con sol
+    if (s.clima.tipo === 'arcoiris_sol') {
+      const arcCols = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#c084fc'];
+      arcCols.forEach((col, idx) => {
+        ctx.fillStyle = col;
+        ctx.globalAlpha = 0.25;
+        ctx.fillRect(this.virtualWidth * 0.4 + idx * 4, 18 + idx * 3, this.virtualWidth * 0.5, 3);
+        ctx.globalAlpha = 1.0;
+      });
     }
   }
 
-  drawGround() {
-    this.ctx.save();
-    this.ctx.fillStyle = '#1e3522';
-    this.ctx.beginPath();
-    this.ctx.ellipse(this.width / 2, this.height + 15, this.width * 0.65, 75, 0, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    this.ctx.strokeStyle = '#3e6b3f';
-    this.ctx.lineWidth = 3.5;
-    this.ctx.stroke();
-    this.ctx.restore();
+  drawPixelMountainsAndTrees(ctx) {
+    // Silueta de Araucarias y Coihues de fondo
+    ctx.fillStyle = 'rgba(16, 38, 24, 0.65)';
+    for (let x = 10; x < this.virtualWidth; x += 32) {
+      // Tronco
+      ctx.fillRect(x + 6, 30, 3, this.virtualHeight * 0.5);
+      // Follaje piramidal
+      ctx.fillRect(x + 2, 45, 11, 8);
+      ctx.fillRect(x + 4, 38, 7, 7);
+      ctx.fillRect(x + 5, 32, 5, 6);
+    }
   }
 
-  drawWeatherEffects() {
+  drawPixelGround(ctx) {
+    const groundY = this.virtualHeight - 58;
+
+    // Capa de tierra
+    ctx.fillStyle = PALETTE.groundDark;
+    ctx.fillRect(0, groundY + 12, this.virtualWidth, this.virtualHeight - groundY);
+
+    // Manto de hierba y musgo
+    ctx.fillStyle = PALETTE.groundMid;
+    ctx.fillRect(0, groundY, this.virtualWidth, 14);
+
+    ctx.fillStyle = PALETTE.groundMoss;
+    for (let x = 0; x < this.virtualWidth; x += 4) {
+      const h = ((x * 7) % 5);
+      ctx.fillRect(x, groundY - h, 3, h + 3);
+    }
+
+    // Pequeñas flores silvestres del bosque
+    for (let x = 15; x < this.virtualWidth; x += 55) {
+      ctx.fillStyle = (x % 2 === 0) ? PALETTE.flowerYellow : PALETTE.flowerRed;
+      ctx.fillRect(x, groundY - 2, 2, 2);
+    }
+  }
+
+  drawPixelStream(ctx) {
+    const streamY = this.virtualHeight - 16;
+    ctx.fillStyle = PALETTE.waterDark;
+    ctx.fillRect(0, streamY, this.virtualWidth, 16);
+
+    ctx.fillStyle = PALETTE.waterMid;
+    ctx.fillRect(0, streamY + 2, this.virtualWidth, 10);
+
+    // Destellos animados de agua
+    const offset = Math.floor(this.waterAnimTimer % 8);
+    ctx.fillStyle = PALETTE.waterLight;
+    for (let x = offset; x < this.virtualWidth; x += 16) {
+      ctx.fillRect(x, streamY + 4, 5, 2);
+    }
+  }
+
+  drawPixelCentralBush(ctx) {
+    const cx = Math.floor(this.virtualWidth / 2);
+    const cy = Math.floor(this.virtualHeight * 0.44);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(this.bushScale, this.bushScale);
+
+    // Sombra pixel en el suelo
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+    ctx.fillRect(-32, 42, 64, 8);
+
+    // Tronco leñoso
+    ctx.fillStyle = PALETTE.trunkDark;
+    ctx.fillRect(-4, 20, 8, 24);
+    ctx.fillStyle = PALETTE.trunkMid;
+    ctx.fillRect(-2, 20, 4, 24);
+
+    // Copa de follaje de maqui en capas pixel
+    const layers = [
+      { y: -30, r: 24, col: PALETTE.leafShadow },
+      { y: -16, r: 32, col: PALETTE.leafMid },
+      { y: 0,   r: 36, col: PALETTE.leafLight },
+      { y: 12,  r: 28, col: PALETTE.leafHighlight }
+    ];
+
+    layers.forEach(l => {
+      ctx.fillStyle = l.col;
+      ctx.fillRect(-l.r, l.y - 12, l.r * 2, l.r * 1.1);
+      // Redondear esquinas estilo pixel
+      ctx.clearRect(-l.r, l.y - 12, 3, 3);
+      ctx.clearRect(l.r - 3, l.y - 12, 3, 3);
+    });
+
+    // Racimos de bayas de maqui moradas
+    const berryPositions = [
+      { x: -18, y: -20 }, { x: 14, y: -22 }, { x: -8, y: -4 },
+      { x: 18, y: 4 }, { x: -22, y: 12 }, { x: 6, y: 16 }
+    ];
+
+    berryPositions.forEach(bp => {
+      ctx.fillStyle = PALETTE.berryMid;
+      ctx.fillRect(bp.x, bp.y, 6, 6);
+      ctx.fillStyle = PALETTE.berryGlint;
+      ctx.fillRect(bp.x, bp.y, 2, 2);
+    });
+
+    ctx.restore();
+  }
+
+  drawPixelPudus(ctx) {
+    for (const p of this.pudusVisuales) {
+      let matrix = PUDU_FRAMES.idle;
+
+      if (p.state === 'walk') {
+        const frameIndex = Math.floor(p.frameTimer) % 2;
+        matrix = frameIndex === 0 ? PUDU_FRAMES.walk1 : PUDU_FRAMES.walk2;
+      } else if (p.state === 'eat') {
+        matrix = PUDU_FRAMES.eat;
+      } else if (p.state === 'sleep') {
+        matrix = PUDU_FRAMES.sleep;
+      }
+
+      // Dibujar sprite de pudú con escala 1 y dirección
+      drawPixelMatrix(ctx, matrix, PUDU_COLOR_MAP, p.x, p.y, 1, p.direction < 0);
+
+      // Accesorio en la cabeza si no está durmiendo
+      if (p.state !== 'sleep' && p.hat && ACCESSORY_SPRITES[p.hat]) {
+        const hatColorMap = {
+          'G': PALETTE.leafHighlight,
+          'R': PALETTE.flowerRed,
+          'Y': '#facc15'
+        };
+        const hx = p.direction > 0 ? p.x + 8 : p.x + 2;
+        drawPixelMatrix(ctx, ACCESSORY_SPRITES[p.hat], hatColorMap, hx, p.y - 4, 1);
+      }
+
+      // Si duerme, mostrar 'Zzz' pixel
+      if (p.state === 'sleep') {
+        ctx.fillStyle = '#bae6fd';
+        ctx.font = '7px sans-serif';
+        ctx.fillText("Zzz", Math.floor(p.x + 8), Math.floor(p.y - 4));
+      }
+    }
+  }
+
+  drawPixelMonito(ctx) {
+    const mx = 24;
+    const my = 34;
+
+    // Rama
+    ctx.fillStyle = PALETTE.trunkDark;
+    ctx.fillRect(0, my + 6, 44, 4);
+
+    drawPixelMatrix(ctx, MONITO_SPRITE, MONITO_COLOR_MAP, mx, my, 1);
+  }
+
+  drawPixelChucao(ctx) {
+    const ch = this.state.data.chucao;
+    const frame = Math.floor(Date.now() / 150) % 2 === 0 ? CHUCAO_SPRITES.fly1 : CHUCAO_SPRITES.fly2;
+    drawPixelMatrix(ctx, frame, CHUCAO_COLOR_MAP, ch.x, ch.y, 1, ch.direccion < 0);
+
+    // Halo dorado pixel
+    ctx.fillStyle = '#fde047';
+    ctx.fillRect(Math.floor(ch.x - 2), Math.floor(ch.y + 4), 2, 2);
+  }
+
+  drawPixelWeather(ctx) {
     const s = this.state.data;
-    this.ctx.save();
 
     if (s.clima.tipo === 'lluvia_suave') {
-      this.ctx.strokeStyle = 'rgba(210, 235, 245, 0.38)';
-      this.ctx.lineWidth = 1.1;
-      for (const drop of this.raindrops) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(drop.x, drop.y);
-        this.ctx.lineTo(drop.x - 1, drop.y + drop.length);
-        this.ctx.stroke();
+      ctx.fillStyle = 'rgba(186, 230, 253, 0.45)';
+      for (const d of this.raindrops) {
+        ctx.fillRect(Math.floor(d.x), Math.floor(d.y), 1, Math.floor(d.length));
       }
     } else if (s.clima.tipo === 'viento_hojarasca') {
-      for (const leaf of this.leaves) {
-        this.ctx.save();
-        this.ctx.translate(leaf.x, leaf.y);
-        this.ctx.rotate(leaf.rot);
-        this.ctx.fillStyle = leaf.color;
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, 0, leaf.size, leaf.size * 0.55, 0, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.restore();
+      for (const l of this.leaves) {
+        ctx.fillStyle = l.color;
+        ctx.fillRect(Math.floor(l.x), Math.floor(l.y), 3, 2);
       }
     }
 
-    this.ctx.restore();
-  }
-
-  drawGroundBerries() {
-    this.ctx.save();
-    for (const b of this.groundBerries) {
-      this.ctx.fillStyle = '#39123D';
-      this.ctx.beginPath();
-      this.ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Brillo
-      this.ctx.fillStyle = '#c084fc';
-      this.ctx.beginPath();
-      this.ctx.arc(b.x - 1.5, b.y - 1.5, 1.6, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
-    this.ctx.restore();
-  }
-
-  drawCentralBush() {
-    this.ctx.save();
-    const cx = this.width / 2;
-    const cy = this.height * 0.44;
-
-    this.ctx.translate(cx, cy);
-    this.ctx.scale(this.bushScale, this.bushScale);
-
-    // Sombra del arbusto
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
-    this.ctx.beginPath();
-    this.ctx.ellipse(0, 75, 75, 22, 0, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Hojas del arbusto de maqui
-    const leafColors = ['#1a4329', '#275836', '#3d784a'];
-    const clusterPositions = [
-      { x: -35, y: -20, r: 44, color: leafColors[0] },
-      { x: 35, y: -15, r: 46, color: leafColors[0] },
-      { x: 0, y: -45, r: 50, color: leafColors[1] },
-      { x: -22, y: 15, r: 47, color: leafColors[1] },
-      { x: 25, y: 18, r: 48, color: leafColors[2] },
-      { x: 0, y: 0, r: 54, color: leafColors[2] }
-    ];
-
-    for (const c of clusterPositions) {
-      this.ctx.fillStyle = c.color;
-      this.ctx.beginPath();
-      this.ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
-
-    // Racimos de Maquis maduros
-    const berryClusters = [
-      { x: -25, y: -15 }, { x: 22, y: -25 }, { x: -10, y: 15 },
-      { x: 30, y: 10 }, { x: -40, y: 5 }, { x: 5, y: -35 }, { x: 0, y: 35 }
-    ];
-
-    for (const b of berryClusters) {
-      this.ctx.fillStyle = '#39123D';
-      this.ctx.beginPath();
-      this.ctx.arc(b.x, b.y, 6.5, 0, Math.PI * 2);
-      this.ctx.arc(b.x + 5, b.y + 4, 6, 0, Math.PI * 2);
-      this.ctx.arc(b.x - 4, b.y + 5, 5.5, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Brillo
-      this.ctx.fillStyle = '#d8b4fe';
-      this.ctx.beginPath();
-      this.ctx.arc(b.x - 1.5, b.y - 1.5, 2, 0, Math.PI * 2);
-      this.ctx.arc(b.x + 3.5, b.y + 2.5, 1.6, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
-
-    this.ctx.restore();
-  }
-
-  drawPudus() {
-    for (const p of this.pudusVisuales) {
-      this.ctx.save();
-      const bounce = Math.sin(p.bounceTimer) * 2;
-      this.ctx.translate(p.x, p.y + bounce);
-      this.ctx.scale(p.direction, 1);
-
-      // Sombra
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-      this.ctx.beginPath();
-      this.ctx.ellipse(0, 16, 15, 5, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Si está siendo acariciado, salto de alegría
-      if (p.isPetting) {
-        this.ctx.translate(0, -4);
+    // Partículas de corazón y humo
+    for (const p of this.pixelParticles) {
+      ctx.fillStyle = p.color;
+      if (p.isHeart) {
+        // Corazón pixel de 4x3
+        ctx.fillRect(Math.floor(p.x), Math.floor(p.y), 4, 3);
+      } else {
+        ctx.fillRect(Math.floor(p.x), Math.floor(p.y), 2, 2);
       }
-
-      // Cuerpo rechoncho del pudú
-      this.ctx.fillStyle = '#7a3e26';
-      this.ctx.beginPath();
-      this.ctx.ellipse(0, 4, 15, 10, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Patitas
-      this.ctx.fillStyle = '#542817';
-      this.ctx.fillRect(-8, 10, 3.5, 7);
-      this.ctx.fillRect(5, 10, 3.5, 7);
-
-      // Cabeza
-      this.ctx.fillStyle = '#8a472c';
-      this.ctx.beginPath();
-      this.ctx.arc(10, -3, 8.5, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Orejita
-      this.ctx.fillStyle = '#612d19';
-      this.ctx.beginPath();
-      this.ctx.ellipse(7, -11, 4, 2.5, -0.4, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Mejilla sonrojada si es regalón
-      if (p.isPetting) {
-        this.ctx.fillStyle = 'rgba(244, 63, 94, 0.55)';
-        this.ctx.beginPath();
-        this.ctx.arc(9, 0, 2.8, 0, Math.PI * 2);
-        this.ctx.fill();
-      }
-
-      // Ojito tierno
-      this.ctx.fillStyle = '#1c0f0a';
-      this.ctx.beginPath();
-      this.ctx.arc(12, -4, 2, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Brillo en el ojo
-      this.ctx.fillStyle = '#ffffff';
-      this.ctx.beginPath();
-      this.ctx.arc(12.6, -4.6, 0.8, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Hocico
-      this.ctx.fillStyle = '#22110c';
-      this.ctx.beginPath();
-      this.ctx.arc(17.5, -2, 2.2, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Sombrerito / Accesorio
-      if (p.hat) {
-        this.ctx.font = '11px sans-serif';
-        this.ctx.fillText(p.hat, 6, -12);
-      }
-
-      this.ctx.restore();
     }
   }
 
-  drawMonitoDelMonte() {
-    this.ctx.save();
-    const mx = 50;
-    const my = 45;
-
-    // Ramita
-    this.ctx.strokeStyle = '#5c4033';
-    this.ctx.lineWidth = 5;
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, 50);
-    this.ctx.lineTo(85, 42);
-    this.ctx.stroke();
-
-    // Monito del monte
-    this.ctx.fillStyle = '#8d6e63';
-    this.ctx.beginPath();
-    this.ctx.arc(mx, my, 8, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Ojos negros grandes
-    this.ctx.fillStyle = '#212121';
-    this.ctx.beginPath();
-    this.ctx.arc(mx + 4, my - 2, 2.5, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Colita prensil
-    this.ctx.strokeStyle = '#8d6e63';
-    this.ctx.lineWidth = 3;
-    this.ctx.beginPath();
-    this.ctx.arc(mx - 8, my + 4, 6, 0, Math.PI);
-    this.ctx.stroke();
-
-    this.ctx.restore();
-  }
-
-  drawChucao() {
-    const ch = this.state.data.chucao;
-    if (!ch.activo) return;
-
-    this.ctx.save();
-    this.ctx.translate(ch.x, ch.y);
-    this.ctx.scale(ch.direccion, 1);
-
-    // Cuerpo
-    this.ctx.fillStyle = '#3a3430';
-    this.ctx.beginPath();
-    this.ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Pecho rufo
-    this.ctx.fillStyle = '#cf5723';
-    this.ctx.beginPath();
-    this.ctx.arc(4, 2, 7, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Colita levantada hacia arriba
-    this.ctx.fillStyle = '#2c2522';
-    this.ctx.beginPath();
-    this.ctx.moveTo(-7, -2);
-    this.ctx.lineTo(-15, -12);
-    this.ctx.lineTo(-9, -4);
-    this.ctx.fill();
-
-    // Ojo y pico
-    this.ctx.fillStyle = '#111';
-    this.ctx.beginPath();
-    this.ctx.arc(6, -2, 1.6, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Halo dorado
-    this.ctx.strokeStyle = '#fcd34d';
-    this.ctx.lineWidth = 2.2;
-    this.ctx.beginPath();
-    this.ctx.arc(0, 0, 15, 0, Math.PI * 2);
-    this.ctx.stroke();
-
-    this.ctx.restore();
-  }
-
-  drawParticlesAndTexts() {
-    this.ctx.save();
-
-    // Partículas de bayas
-    for (const p of this.clickParticles) {
-      this.ctx.globalAlpha = p.alpha;
-      this.ctx.fillStyle = p.color;
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
-
-    // Textos flotantes
+  drawPixelTexts(ctx) {
     for (const ft of this.floatingTexts) {
-      this.ctx.globalAlpha = ft.alpha;
-      this.ctx.fillStyle = ft.color;
-      this.ctx.font = `bold ${ft.size}px 'Nunito', sans-serif`;
-      this.ctx.textAlign = 'center';
-      this.ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.fillStyle = ft.color;
+      ctx.globalAlpha = ft.alpha;
+      ctx.font = `bold ${ft.size}px 'Nunito', sans-serif`;
+      ctx.fillText(ft.text, ft.x, ft.y);
     }
-
-    this.ctx.restore();
+    ctx.globalAlpha = 1.0;
   }
 }
