@@ -552,6 +552,135 @@ export class ForestDiorama {
     );
   }
 
+  drawPixelSky(ctx) {
+    const s = this.state.data;
+    const skyColors = s.clima.tipo === 'arcoiris_sol'
+      ? ['#2f5e43', '#3d7756', '#52966e', '#72b68e']
+      : (s.clima.tipo === 'viento_hojarasca'
+        ? ['#223a2d', '#2d4b3b', '#3b5f4c', '#4b755e']
+        : ['#172e21', '#1f3d2c', '#294d38', '#345e46']);
+
+    const bandH = Math.floor(this.virtualHeight * 0.6 / skyColors.length);
+    skyColors.forEach((col, i) => {
+      ctx.fillStyle = col;
+      ctx.fillRect(0, i * bandH, this.virtualWidth, bandH + 2);
+    });
+
+    // Arcoíris pixel si hay llovizna con sol
+    if (s.clima.tipo === 'arcoiris_sol') {
+      const arcCols = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#c084fc'];
+      arcCols.forEach((col, idx) => {
+        ctx.fillStyle = col;
+        ctx.globalAlpha = 0.25;
+        ctx.fillRect(this.virtualWidth * 0.4 + idx * 4, 18 + idx * 3, this.virtualWidth * 0.5, 3);
+        ctx.globalAlpha = 1.0;
+      });
+    }
+  }
+
+  drawPixelMountainsAndTrees(ctx) {
+    // Silueta de Araucarias y Coihues de fondo
+    ctx.fillStyle = 'rgba(16, 38, 24, 0.65)';
+    for (let x = 10; x < this.virtualWidth; x += 32) {
+      // Tronco
+      ctx.fillRect(x + 6, 30, 3, this.virtualHeight * 0.5);
+      // Follaje piramidal
+      ctx.fillRect(x + 2, 45, 11, 8);
+      ctx.fillRect(x + 4, 38, 7, 7);
+      ctx.fillRect(x + 5, 32, 5, 6);
+    }
+  }
+
+  drawPixelGround(ctx) {
+    const groundY = this.virtualHeight - 58;
+
+    // Capa de tierra
+    ctx.fillStyle = PALETTE.groundDark;
+    ctx.fillRect(0, groundY + 12, this.virtualWidth, this.virtualHeight - groundY);
+
+    // Manto de hierba y musgo
+    ctx.fillStyle = PALETTE.groundMid;
+    ctx.fillRect(0, groundY, this.virtualWidth, 14);
+
+    ctx.fillStyle = PALETTE.groundMoss;
+    for (let x = 0; x < this.virtualWidth; x += 4) {
+      const h = ((x * 7) % 5);
+      ctx.fillRect(x, groundY - h, 3, h + 3);
+    }
+
+    // Pequeñas flores silvestres del bosque
+    for (let x = 15; x < this.virtualWidth; x += 55) {
+      ctx.fillStyle = (x % 2 === 0) ? PALETTE.flowerYellow : PALETTE.flowerRed;
+      ctx.fillRect(x, groundY - 2, 2, 2);
+    }
+  }
+
+  drawPixelStream(ctx) {
+    const streamY = this.virtualHeight - 16;
+    ctx.fillStyle = PALETTE.waterDark;
+    ctx.fillRect(0, streamY, this.virtualWidth, 16);
+
+    ctx.fillStyle = PALETTE.waterMid;
+    ctx.fillRect(0, streamY + 2, this.virtualWidth, 10);
+
+    // Destellos animados de agua
+    const offset = Math.floor(this.waterAnimTimer % 8);
+    ctx.fillStyle = PALETTE.waterLight;
+    for (let x = offset; x < this.virtualWidth; x += 16) {
+      ctx.fillRect(x, streamY + 4, 5, 2);
+    }
+  }
+
+  drawPixelCentralBush(ctx) {
+    const cx = Math.floor(this.virtualWidth / 2);
+    const cy = Math.floor(this.virtualHeight * 0.44);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(this.bushScale, this.bushScale);
+
+    // Sombra pixel en el suelo
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+    ctx.fillRect(-32, 42, 64, 8);
+
+    // Tronco leñoso
+    ctx.fillStyle = PALETTE.trunkDark;
+    ctx.fillRect(-4, 20, 8, 24);
+    ctx.fillStyle = PALETTE.trunkMid;
+    ctx.fillRect(-2, 20, 4, 24);
+
+    // Copa de follaje de maqui en capas pixel
+    const layers = [
+      { y: -30, r: 24, col: PALETTE.leafShadow },
+      { y: -16, r: 32, col: PALETTE.leafMid },
+      { y: 0,   r: 36, col: PALETTE.leafLight },
+      { y: 12,  r: 28, col: PALETTE.leafHighlight }
+    ];
+
+    layers.forEach(l => {
+      ctx.fillStyle = l.col;
+      ctx.fillRect(-l.r, l.y - 12, l.r * 2, l.r * 1.1);
+      // Redondear esquinas estilo pixel
+      ctx.clearRect(-l.r, l.y - 12, 3, 3);
+      ctx.clearRect(l.r - 3, l.y - 12, 3, 3);
+    });
+
+    // Racimos de bayas de maqui moradas
+    const berryPositions = [
+      { x: -18, y: -20 }, { x: 14, y: -22 }, { x: -8, y: -4 },
+      { x: 18, y: 4 }, { x: -22, y: 12 }, { x: 6, y: 16 }
+    ];
+
+    berryPositions.forEach(bp => {
+      ctx.fillStyle = PALETTE.berryMid;
+      ctx.fillRect(bp.x, bp.y, 6, 6);
+      ctx.fillStyle = PALETTE.berryGlint;
+      ctx.fillRect(bp.x, bp.y, 2, 2);
+    });
+
+    ctx.restore();
+  }
+
   drawPixelRanitaDarwin(ctx) {
     const r = this.state.data.ranitaDarwin;
     if (!r || !r.activa) return;
