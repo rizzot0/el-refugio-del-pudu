@@ -1,8 +1,9 @@
 /**
- * Motor Central de Lógica y Loop Temporal
+ * Motor Central de Lógica, Fases y Ciclos Ambientales
  */
 import { SaveManager } from './save.js';
 import { giftConfig } from './giftConfig.js';
+import { FAUNA_FLORA_DATA } from './faunaData.js';
 
 export class GameEngine {
   constructor(state, sound, diorama, ui) {
@@ -13,7 +14,8 @@ export class GameEngine {
 
     this.lastTime = performance.now();
     this.saveTimer = 0;
-    this.chucaoSpawnTimer = 45; // Primer Chucao a los 45s aprox
+    this.chucaoSpawnTimer = 35; // Primer Chucao a los 35s
+    this.climaTimer = 75; // Cambio de clima cada 75s
   }
 
   start() {
@@ -36,7 +38,7 @@ export class GameEngine {
     const s = this.state.data;
     s.tiempoJugadoSegundos += dt;
 
-    // 1. Producción pasiva de Maquis
+    // 1. Producción pasiva de Maquis (MPS)
     const mps = this.state.getMaquisPorSegundo();
     if (mps > 0) {
       const ganancia = mps * dt;
@@ -44,7 +46,16 @@ export class GameEngine {
       s.totalMaquis += ganancia;
     }
 
-    // 2. Temporizador de Suerte del Chucao
+    // 2. Temporizador de caricias a los pudús
+    if (s.caricias.segundosBonoCaricia > 0) {
+      s.caricias.segundosBonoCaricia -= dt;
+      if (s.caricias.segundosBonoCaricia <= 0) {
+        s.caricias.multiplicadorCaricia = 1;
+        this.ui.notify("Los pudús descansan de las caricias.", "info");
+      }
+    }
+
+    // 3. Temporizador de Suerte del Chucao
     if (s.chucao.segundosRestantesSuerte > 0) {
       s.chucao.segundosRestantesSuerte -= dt;
       if (s.chucao.segundosRestantesSuerte <= 0) {
@@ -53,10 +64,9 @@ export class GameEngine {
       }
     }
 
-    // 3. Manejo de vuelo del Chucao
+    // 4. Manejo del vuelo del Chucao
     if (s.chucao.activo) {
       s.chucao.x += (s.chucao.direccion * 75) * dt;
-      // Si sale de la pantalla
       if ((s.chucao.direccion > 0 && s.chucao.x > this.diorama.width + 40) ||
           (s.chucao.direccion < 0 && s.chucao.x < -40)) {
         s.chucao.activo = false;
@@ -65,14 +75,21 @@ export class GameEngine {
       this.chucaoSpawnTimer -= dt;
       if (this.chucaoSpawnTimer <= 0) {
         this.spawnChucao();
-        this.chucaoSpawnTimer = 70 + Math.random() * 60; // Cada 70-130 segundos
+        const baseCooldown = s.mejoras.cantoChucaoArmonico?.comprada ? 50 : 75;
+        this.chucaoSpawnTimer = baseCooldown + Math.random() * 40;
       }
     }
 
-    // 4. Verificación de Fases y Desbloqueos Narrativos
+    // 5. Ciclo Dinámico del Clima
+    this.climaTimer -= dt;
+    if (this.climaTimer <= 0) {
+      this.cambiarClima();
+    }
+
+    // 6. Verificación de Fases, Desbloqueos Didácticos y Recuerdos
     this.checkPhaseProgression();
 
-    // 5. Guardado automático periódico (cada 5 segundos)
+    // 7. Guardado automático periódico (cada 5s)
     this.saveTimer += dt;
     if (this.saveTimer >= 5) {
       this.saveTimer = 0;
@@ -80,12 +97,34 @@ export class GameEngine {
     }
   }
 
+  cambiarClima() {
+    const s = this.state.data;
+    const climas = [
+      { tipo: 'lluvia_suave', nombre: 'Lluvia Sureña Suave', icono: '🌧️', mult: 1, duracion: 80 },
+      { tipo: 'viento_hojarasca', nombre: 'Viento con Hojarasca', icono: '🍂', mult: 1.25, duracion: 50 },
+      { tipo: 'arcoiris_sol', nombre: 'Llovizna con Sol y Arcoíris', icono: '🌈', mult: 2.0, duracion: 40 }
+    ];
+
+    // Escoger un clima diferente al actual
+    const disponibles = climas.filter(c => c.tipo !== s.clima.tipo);
+    const nuevoClima = disponibles[Math.floor(Math.random() * disponibles.length)];
+
+    s.clima.tipo = nuevoClima.tipo;
+    s.clima.nombre = nuevoClima.nombre;
+    s.clima.icono = nuevoClima.icono;
+    s.clima.multiplicador = nuevoClima.mult;
+    this.climaTimer = nuevoClima.duracion;
+
+    this.sound.playWindBreeze();
+    this.ui.notify(`El clima ha cambiado: ¡${nuevoClima.nombre}! (${nuevoClima.mult > 1 ? `x${nuevoClima.mult} producción` : 'Paz y lluvia'})`, "clima");
+  }
+
   spawnChucao() {
     const s = this.state.data;
     s.chucao.activo = true;
     s.chucao.direccion = Math.random() > 0.5 ? 1 : -1;
     s.chucao.x = s.chucao.direccion > 0 ? -20 : this.diorama.width + 20;
-    s.chucao.y = 50 + Math.random() * (this.diorama.height * 0.4);
+    s.chucao.y = 45 + Math.random() * (this.diorama.height * 0.35);
     this.sound.playChucao();
     this.ui.notify("¡Un Chucao curioso vuela por el bosque!", "chucao");
   }
@@ -96,16 +135,18 @@ export class GameEngine {
 
     s.chucao.activo = false;
     s.chucao.multiplicadorSuerte = 3;
-    s.chucao.segundosRestantesSuerte = 30;
+    const duracion = s.mejoras.cantoChucaoArmonico?.comprada ? 45 : 30;
+    s.chucao.segundosRestantesSuerte = duracion;
 
     // Bono inmediato de bayas
     const mps = this.state.getMaquisPorSegundo();
-    const bono = Math.max(50, Math.floor(mps * 20));
+    const bono = Math.max(35, Math.floor(mps * 18));
     s.maquis += bono;
     s.totalMaquis += bono;
 
     this.sound.playChucao();
-    this.ui.notify(`¡Buena suerte del Chucao! +${bono} maquis y x3 producción por 30s.`, "success");
+    this.ui.notify(`¡Buena suerte del Chucao! +${bono.toLocaleString()} maquis y x3 producción por ${duracion}s.`, "success");
+    this.desbloquearFichaDidactica("chucao");
   }
 
   checkPhaseProgression() {
@@ -117,29 +158,55 @@ export class GameEngine {
       this.sound.playChime();
       this.ui.notify("¡Pichi ahora vive en el refugio! Puedes construir camitas y plantar brotes.", "hito");
       this.desbloquearRecuerdo("recuerdo_1");
+      this.desbloquearFichaDidactica("canelo");
     }
 
-    // Desbloqueo de Fase 3: El Taller
-    if (s.fase === 2 && s.totalMaquis >= 8000) {
+    // Fase 2 a Fase 3: Amigos del Bosque
+    if (s.fase === 2 && s.totalMaquis >= 3500) {
       s.fase = 3;
+      this.sound.playChime();
+      this.ui.notify("¡Llegan nuevos amigos del bosque! El Monito del Monte y la Ranita de Darwin se acercan.", "hito");
+      this.desbloquearRecuerdo("recuerdo_2");
+      this.desbloquearFichaDidactica("monito_monte");
+      this.desbloquearFichaDidactica("ranita_darwin");
+    }
+
+    // Fase 3 a Fase 4: El Taller Austral
+    if (s.fase === 3 && s.totalMaquis >= 18000) {
+      s.fase = 4;
       s.mejoras.recetaMermelada.desbloqueada = true;
       this.sound.playChime();
-      this.ui.notify("¡Se desbloqueó El Taller del Bosque! Ahora puedes cocinar mermeladas.", "hito");
+      this.ui.notify("¡Se desbloqueó El Taller del Bosque! Ahora puedes cocinar mermeladas en greda.", "hito");
       this.desbloquearRecuerdo("recuerdo_4");
+      this.desbloquearFichaDidactica("copihue");
+      this.desbloquearFichaDidactica("carpintero_negro");
     }
 
-    // Desbloqueo de Fase 4: Preparación del Gran Picnic
-    if (s.fase === 3 && s.totalMaquis >= 45000) {
-      s.fase = 4;
+    // Fase 4 a Fase 5: Preparación del Gran Picnic
+    if (s.fase === 4 && s.totalMaquis >= 45000) {
+      s.fase = 5;
       this.sound.playChime();
       this.ui.notify("¡La manada está lista para organizar El Gran Picnic!", "hito");
+      this.desbloquearRecuerdo("recuerdo_3");
     }
 
-    // Desbloqueo dinámico de mejoras según progreso
-    if (s.totalMaquis >= 150) s.mejoras.zapatosMusgo.desbloqueada = true;
-    if (s.totalMaquis >= 800) s.mejoras.bufandasChilotas.desbloqueada = true;
-    if (s.totalMaquis >= 3000) s.mejoras.teCanelo.desbloqueada = true;
-    if (s.totalMaquis >= 25000) s.mejoras.coronaCopihues.desbloqueada = true;
+    // Desbloqueo gradual de mejoras según maquis acumulados
+    if (s.totalMaquis >= 120) s.mejoras.zapatosMusgo.desbloqueada = true;
+    if (s.totalMaquis >= 650) s.mejoras.bufandasChilotas.desbloqueada = true;
+    if (s.totalMaquis >= 2400) s.mejoras.teCanelo.desbloqueada = true;
+    if (s.totalMaquis >= 10000) s.mejoras.cantoChucaoArmonico.desbloqueada = true;
+    if (s.totalMaquis >= 24000) s.mejoras.coronaCopihues.desbloqueada = true;
+  }
+
+  desbloquearFichaDidactica(id) {
+    const s = this.state.data;
+    if (!s.fichasDesbloqueadas.includes(id)) {
+      s.fichasDesbloqueadas.push(id);
+      const ficha = FAUNA_FLORA_DATA.find(f => f.id === id);
+      if (ficha) {
+        this.ui.notify(`¡Nueva ficha en la Bitácora: ${ficha.nombre}!`, "didactica");
+      }
+    }
   }
 
   desbloquearRecuerdo(id) {
@@ -153,7 +220,7 @@ export class GameEngine {
     }
   }
 
-  // Acción manual al alimentar al pudú en Fase 1
+  // Acción manual para alimentar al pudú en Fase 1
   alimentarPrimerPudu() {
     const s = this.state.data;
     if (s.puduAmigado) return;
@@ -172,31 +239,30 @@ export class GameEngine {
     }
   }
 
-  // Crafteo de Mermelada en Fase 3
+  // Crafteo de Mermelada en Fase 4
   cocinarMermelada() {
     const s = this.state.data;
-    const costoMaquis = 1500;
+    const costoMaquis = 1200;
     if (s.maquis >= costoMaquis) {
       s.maquis -= costoMaquis;
       s.mermeladas += 1;
       s.totalMermeladas += 1;
       this.sound.playChime();
-      this.ui.notify("¡Has cocinado un frasco de mermelada de maqui pura! (+2% permanente)", "success");
+      this.ui.notify("¡Has elaborado un frasco de mermelada de maqui pura! (+3% permanente a toda la producción)", "success");
     } else {
-      this.ui.notify(`Necesitas ${costoMaquis} maquis para preparar una mermelada en greda.`, "warn");
+      this.ui.notify(`Necesitas ${costoMaquis.toLocaleString()} maquis para preparar una mermelada en olla de greda.`, "warn");
     }
   }
 
   // Gran Picnic (Objetivo final)
   celebrarGranPicnic() {
     const s = this.state.data;
-    const metaMaquis = 80000;
-    const metaMermeladas = 15;
+    const metaMaquis = 55000;
+    const metaMermeladas = 10;
 
     if (s.maquis >= metaMaquis && s.mermeladas >= metaMermeladas) {
       s.maquis -= metaMaquis;
       s.picnicCelebrado = true;
-      s.fase = 5;
       this.desbloquearRecuerdo("recuerdo_5");
       this.sound.playChime();
       this.ui.abrirModalRegalo();

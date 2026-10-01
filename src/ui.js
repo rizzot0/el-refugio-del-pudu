@@ -1,15 +1,16 @@
 /**
- * Interfaz de Usuario, Pestañas, Modales y Notificaciones
+ * Interfaz de Usuario, Pestañas, Modales, Enciclopedia y Notificaciones
  */
 import { giftConfig } from './giftConfig.js';
 import { SaveManager } from './save.js';
+import { FAUNA_FLORA_DATA } from './faunaData.js';
 
 export class GameUI {
   constructor(state, sound, diorama) {
     this.state = state;
     this.sound = sound;
     this.diorama = diorama;
-    this.engine = null; // Asignado luego
+    this.engine = null;
 
     this.activeTab = 'cosecha'; // 'cosecha' | 'refugio' | 'taller' | 'bitacora'
     this.setupListeners();
@@ -20,7 +21,7 @@ export class GameUI {
   }
 
   setupListeners() {
-    // Pestañas
+    // 1. Navegación por Pestañas
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tab = e.currentTarget.dataset.tab;
@@ -28,7 +29,7 @@ export class GameUI {
       });
     });
 
-    // Toggle de sonido
+    // 2. Toggle de Sonido Ambiental
     const soundBtn = document.getElementById('btn-sound');
     if (soundBtn) {
       soundBtn.addEventListener('click', () => {
@@ -38,7 +39,18 @@ export class GameUI {
       });
     }
 
-    // Click en el arbusto central de Canvas
+    // 3. Toggle de Ritmo de Juego (Normal vs Veloz)
+    const speedBtn = document.getElementById('btn-speed');
+    if (speedBtn) {
+      speedBtn.addEventListener('click', () => {
+        const s = this.state.data;
+        s.ritmo = s.ritmo === 'calido' ? 'veloz' : 'calido';
+        speedBtn.innerHTML = s.ritmo === 'veloz' ? '⚡ Ritmo: Express' : '⏳ Ritmo: Cálido';
+        this.notify(`Ritmo cambiado a: ${s.ritmo === 'veloz' ? 'Express (~45-60 min)' : 'Cálido (~75-90 min)'}`, 'info');
+      });
+    }
+
+    // 4. Click en el Canvas: Detección inteligente de Chucao, Pudús o Arbusto
     const canvas = document.getElementById('diorama-canvas');
     if (canvas) {
       canvas.addEventListener('click', (e) => {
@@ -46,17 +58,26 @@ export class GameUI {
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
 
-        // Comprobar si hizo click sobre el Chucao
+        // A. Verificar click sobre el Chucao
         const ch = this.state.data.chucao;
         if (ch.activo) {
           const distChucao = Math.hypot(clickX - ch.x, clickY - ch.y);
-          if (distChucao < 30) {
+          if (distChucao < 32) {
             this.engine.clickChucao();
             return;
           }
         }
 
-        // Click regular en el arbusto
+        // B. Verificar click sobre algún Pudú en el suelo para acariciarlo
+        for (const pudu of this.diorama.pudusVisuales) {
+          const distPudu = Math.hypot(clickX - pudu.x, clickY - pudu.y);
+          if (distPudu < 26) {
+            this.diorama.petPudu(pudu);
+            return;
+          }
+        }
+
+        // C. Click regular en el arbusto central
         const ganancia = this.state.getMaquisPorClick();
         this.state.data.maquis += ganancia;
         this.state.data.totalMaquis += ganancia;
@@ -65,7 +86,18 @@ export class GameUI {
       });
     }
 
-    // Modal de Regalo - Cerrar
+    // 5. Apertura del Sobre Interactivo
+    const envelopeCover = document.getElementById('envelope-cover');
+    const letterContentArea = document.getElementById('letter-content-area');
+    if (envelopeCover && letterContentArea) {
+      envelopeCover.addEventListener('click', () => {
+        this.sound.playChime();
+        envelopeCover.classList.add('hidden');
+        letterContentArea.classList.remove('hidden');
+      });
+    }
+
+    // 6. Cerrar Modal de Regalo
     const closeLetterBtn = document.getElementById('btn-cerrar-carta');
     if (closeLetterBtn) {
       closeLetterBtn.addEventListener('click', () => {
@@ -73,11 +105,11 @@ export class GameUI {
       });
     }
 
-    // Botón reiniciar partida (con confirmación)
+    // 7. Reiniciar partida
     const resetBtn = document.getElementById('btn-reset');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        if (confirm("¿Seguro que deseas reiniciar el refugio desde el inicio?")) {
+        if (confirm("¿Deseas reiniciar el refugio desde el inicio? Tu progreso volverá al claro silvestre.")) {
           SaveManager.reset();
         }
       });
@@ -107,12 +139,21 @@ export class GameUI {
     setTimeout(() => {
       toast.classList.add('fade-out');
       setTimeout(() => toast.remove(), 400);
-    }, 3500);
+    }, 3800);
   }
 
   abrirModalRegalo() {
     const modal = document.getElementById('modal-regalo');
     if (!modal) return;
+
+    // Resetear vista del sobre cerrado
+    const envelopeCover = document.getElementById('envelope-cover');
+    const letterContentArea = document.getElementById('letter-content-area');
+    if (envelopeCover) envelopeCover.classList.remove('hidden');
+    if (letterContentArea) letterContentArea.classList.add('hidden');
+
+    const destEl = document.getElementById('letter-destinatario');
+    if (destEl) destEl.innerText = giftConfig.destinatario || "Mi Pudú Favorito";
 
     const carta = giftConfig.cartaFinal;
     document.getElementById('carta-saludo').innerText = carta.saludo;
@@ -131,16 +172,10 @@ export class GameUI {
     modal.classList.remove('hidden');
   }
 
-  mostrarModalOffline(segundos, ganancia) {
-    if (ganancia <= 0) return;
-    const minutos = Math.round(segundos / 60);
-    this.notify(`¡Tus pudús te extrañaron! Mientras descansabas (${minutos} min) recolectaron ${Math.floor(ganancia).toLocaleString()} maquis.`, 'hito');
-  }
-
   render() {
     const s = this.state.data;
 
-    // Actualizar marcadores principales
+    // 1. Actualizar marcadores principales
     const maquisCount = document.getElementById('maquis-count');
     const maquisRate = document.getElementById('maquis-rate');
     if (maquisCount) maquisCount.innerText = Math.floor(s.maquis).toLocaleString();
@@ -149,7 +184,13 @@ export class GameUI {
       maquisRate.innerText = `${mps >= 10 ? Math.round(mps).toLocaleString() : mps.toFixed(1)}/seg`;
     }
 
-    // Indicador de suerte de Chucao
+    // 2. Clima actual
+    const weatherIcon = document.getElementById('weather-icon');
+    const weatherName = document.getElementById('weather-name');
+    if (weatherIcon) weatherIcon.innerText = s.clima.icono;
+    if (weatherName) weatherName.innerText = s.clima.nombre;
+
+    // 3. Indicador de suerte de Chucao
     const luckIndicator = document.getElementById('luck-indicator');
     if (luckIndicator) {
       if (s.chucao.segundosRestantesSuerte > 0) {
@@ -160,7 +201,18 @@ export class GameUI {
       }
     }
 
-    // Fase 1: Panel de domesticar a Pichi
+    // 4. Indicador de Caricia / Pudús felices
+    const petIndicator = document.getElementById('pet-indicator');
+    if (petIndicator) {
+      if (s.caricias.segundosBonoCaricia > 0) {
+        petIndicator.classList.remove('hidden');
+        petIndicator.innerText = `💖 ¡Manada Feliz! +25% (${Math.ceil(s.caricias.segundosBonoCaricia)}s)`;
+      } else {
+        petIndicator.classList.add('hidden');
+      }
+    }
+
+    // 5. Panel Fase 1: Domesticar a Pichi
     const phase1Box = document.getElementById('box-fase-1');
     if (phase1Box) {
       if (s.fase === 1) {
@@ -180,7 +232,7 @@ export class GameUI {
       }
     }
 
-    // Renderizar Pestaña Actual
+    // 6. Renderizar Pestaña Activa
     if (this.activeTab === 'cosecha') this.renderCosecha();
     if (this.activeTab === 'refugio') this.renderRefugio();
     if (this.activeTab === 'taller') this.renderTaller();
@@ -194,7 +246,6 @@ export class GameUI {
     const s = this.state.data;
     container.innerHTML = '';
 
-    // Renderizar Productores
     for (const key in s.productores) {
       const prod = s.productores[key];
       const costo = this.state.getCostoProductor(key);
@@ -207,7 +258,7 @@ export class GameUI {
         <div class="card-info">
           <div class="card-title">${prod.nombre} <span class="card-qty">x${prod.cantidad}</span></div>
           <div class="card-desc">${prod.desc}</div>
-          <div class="card-rate">+${(prod.produccionBase * s.armonia).toFixed(1)}/s cada uno</div>
+          <div class="card-rate">+${(prod.produccionBase * s.armonia).toFixed(1)}/s c/u</div>
         </div>
         <button class="buy-btn" ${!puedeComprar ? 'disabled' : ''}>
           🌰 ${costo.toLocaleString()}
@@ -220,7 +271,7 @@ export class GameUI {
           prod.cantidad++;
           this.sound.playBerryPop();
 
-          // Si es camita de musgo, llega un nuevo pudú
+          // Si es camita de musgo, llega un nuevo pudú con identidad
           if (prod.id === 'camitaMusgo' && s.nombresDisponibles.length > 0) {
             const nuevoPuduData = s.nombresDisponibles.shift();
             s.pudus.push({
@@ -249,7 +300,7 @@ export class GameUI {
     // Lista de pudús habitantes
     const header = document.createElement('div');
     header.className = 'section-header';
-    header.innerHTML = `<h4>Manada de Pudús (${s.pudus.length} habitantes)</h4>`;
+    header.innerHTML = `<h4>Manada del Refugio (${s.pudus.length} habitantes)</h4>`;
     container.appendChild(header);
 
     const pudusGrid = document.createElement('div');
@@ -266,10 +317,10 @@ export class GameUI {
     });
     container.appendChild(pudusGrid);
 
-    // Mejoras de Comunidad
+    // Mejoras de Comunidad y Comodidades
     const subheader = document.createElement('div');
     subheader.className = 'section-header';
-    subheader.innerHTML = `<h4>Comodidades del Bosque</h4>`;
+    subheader.innerHTML = `<h4>Comodidades y Tradiciones del Bosque</h4>`;
     container.appendChild(subheader);
 
     const upgradesContainer = document.createElement('div');
@@ -313,12 +364,12 @@ export class GameUI {
     if (!container) return;
 
     const s = this.state.data;
-    if (s.fase < 3) {
+    if (s.fase < 4) {
       container.innerHTML = `
         <div class="empty-state">
-          <span>🏺</span>
-          <p>El Taller del Bosque aún no ha sido descubierto.</p>
-          <small>Sigue cuidando el refugio y cosechando maquis para desbloquearlo.</small>
+          <span class="empty-icon">🏺</span>
+          <h4>El Taller Austral aún no ha sido descubierto</h4>
+          <p>Sigue cuidando a la manada y cosechando maquis para desbloquear la cocinilla comunitaria.</p>
         </div>
       `;
       return;
@@ -330,13 +381,13 @@ export class GameUI {
           <div class="jam-display">
             <span class="jam-icon">🍯</span>
             <div class="jam-info">
-              <h3>Mermelada de Maqui en Greda</h3>
+              <h3>Mermelada de Maqui en Olla de Greda</h3>
               <p>Frascos elaborados: <strong>${s.mermeladas}</strong></p>
-              <small>Efecto: +${(s.mermeladas * 2)}% permanente a toda la producción del bosque.</small>
+              <small>Efecto: +${(s.mermeladas * 3)}% permanente a toda la producción del bosque.</small>
             </div>
           </div>
-          <button id="btn-cook-jam" class="cta-btn ${s.maquis >= 1500 ? '' : 'disabled'}">
-            Cocinar Frasco (1,500 Maquis)
+          <button id="btn-cook-jam" class="cta-btn ${s.maquis >= 1200 ? '' : 'disabled'}">
+            Cocinar Frasco (1,200 🌰)
           </button>
         </div>
       </div>
@@ -354,16 +405,16 @@ export class GameUI {
     const s = this.state.data;
     container.innerHTML = '';
 
-    // Sección El Gran Picnic (Objetivo Final)
+    // 1. Sección El Gran Picnic (Objetivo Final del Regalo)
     const picnicBox = document.createElement('div');
     picnicBox.className = 'picnic-box';
-    const metaMaquis = 80000;
-    const metaMermeladas = 15;
+    const metaMaquis = 55000;
+    const metaMermeladas = 10;
     const listo = s.maquis >= metaMaquis && s.mermeladas >= metaMermeladas;
 
     picnicBox.innerHTML = `
       <h3>🧺 El Gran Picnic de Primavera</h3>
-      <p>La meta suprema del refugio: un banquete especial para celebrar la amistad y el amor.</p>
+      <p>El hito culminante del refugio: un banquete especial para celebrar el cariño y todo lo florecido.</p>
       <div class="picnic-requirements">
         <div class="req-item ${s.maquis >= metaMaquis ? 'done' : ''}">
           🌰 Maquis: ${Math.floor(s.maquis).toLocaleString()} / ${metaMaquis.toLocaleString()}
@@ -372,8 +423,8 @@ export class GameUI {
           🍯 Mermeladas: ${s.mermeladas} / ${metaMermeladas}
         </div>
       </div>
-      <button id="btn-celebrate-picnic" class="cta-btn ${listo ? 'ready' : 'disabled'}">
-        ${s.picnicCelebrado ? 'Ver Carta del Regalo ✨' : '¡Celebrar el Gran Picnic! 🎉'}
+      <button id="btn-celebrate-picnic" class="cta-btn ${listo || s.picnicCelebrado ? 'ready' : 'disabled'}">
+        ${s.picnicCelebrado ? 'Abrir Sobre de Regalo ✨' : '¡Celebrar el Gran Picnic! 🎉'}
       </button>
     `;
 
@@ -386,10 +437,54 @@ export class GameUI {
     };
     container.appendChild(picnicBox);
 
-    // Lista de Recuerdos desbloqueables
-    const recuerdosHeader = document.createElement('h4');
+    // 2. Enciclopedia Didáctica del Bosque Valdiviano
+    const faunaHeader = document.createElement('div');
+    faunaHeader.className = 'section-header';
+    faunaHeader.innerHTML = `<h4>🌿 Enciclopedia de Flora y Fauna Valdiviana (${s.fichasDesbloqueadas.length} / ${FAUNA_FLORA_DATA.length} descubiertas)</h4>`;
+    container.appendChild(faunaHeader);
+
+    const faunaGrid = document.createElement('div');
+    faunaGrid.className = 'fauna-grid';
+
+    FAUNA_FLORA_DATA.forEach(item => {
+      const descubierta = s.fichasDesbloqueadas.includes(item.id);
+      const card = document.createElement('div');
+      card.className = `fauna-card ${descubierta ? 'unlocked' : 'locked'}`;
+
+      if (descubierta) {
+        card.innerHTML = `
+          <div class="fauna-top">
+            <span class="fauna-icon">${item.icono}</span>
+            <div>
+              <strong>${item.nombre}</strong>
+              <em>${item.nombreCientifico}</em>
+            </div>
+            <span class="fauna-cat">${item.categoria}</span>
+          </div>
+          <p class="fauna-desc">${item.curiosidad}</p>
+          <div class="fauna-reward">🌟 ${item.recompensa}</div>
+        `;
+      } else {
+        card.innerHTML = `
+          <div class="fauna-top">
+            <span class="fauna-icon">🔒</span>
+            <div>
+              <strong>Especie por descubrir</strong>
+              <em>En los senderos del bosque...</em>
+            </div>
+          </div>
+          <p class="fauna-desc">Sigue cuidando el refugio y cosechando para encontrar este habitante nativo.</p>
+        `;
+      }
+
+      faunaGrid.appendChild(card);
+    });
+    container.appendChild(faunaGrid);
+
+    // 3. Recuerdos del Bosque
+    const recuerdosHeader = document.createElement('div');
     recuerdosHeader.className = 'section-header';
-    recuerdosHeader.innerText = 'Recuerdos del Bosque';
+    recuerdosHeader.innerHTML = `<h4>📜 Recuerdos Desbloqueados</h4>`;
     container.appendChild(recuerdosHeader);
 
     const recuerdosList = document.createElement('div');
@@ -403,7 +498,7 @@ export class GameUI {
         <span class="recuerdo-icon">${desbloqueado ? r.icono : '🔒'}</span>
         <div class="recuerdo-text">
           <strong>${r.hito}</strong>
-          <p>${desbloqueado ? r.texto : 'Se revelará a medida que prospere el refugio...'}</p>
+          <p>${desbloqueado ? r.texto : 'Se revelará al alcanzar nuevos momentos del refugio...'}</p>
         </div>
       `;
       recuerdosList.appendChild(card);
