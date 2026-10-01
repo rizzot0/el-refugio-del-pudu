@@ -676,6 +676,15 @@ body {
   color: #7ef6ea;
 }
 
+.pudu-badge-teto {
+  border-color: rgba(225, 29, 72, 0.45);
+  background: rgba(225, 29, 72, 0.08);
+}
+
+.pudu-badge-teto strong {
+  color: #fb7185;
+}
+
 .pudu-hat {
   font-size: 18px;
 }

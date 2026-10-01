@@ -444,6 +444,173 @@ export const MIKU_PUDU_FRAMES = {
 };
 
 // ==========================================================================
+// PUDÚ KASANE TETO (25x21) - Quimera del bosque con taladros rojos en espiral
+// ==========================================================================
+export const TETO_PUDU_FRAMES = {
+  idle: [
+    "...O.A.CR................",
+    "..HHRR.RH................",
+    ".HRRR.KRHC...............",
+    "EBEBR.CRH.CR.............",
+    "BBBBBB.RHC.C.............",
+    ".OOOOBBCRH...............",
+    "...OOOBBD.RHC............",
+    "....OOBBCR.DDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    ".......OBBOD.......DBBB..",
+    "........BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
+  ],
+  walk1: [
+    "...O.A..CR...............",
+    "..HHRR..RH...............",
+    ".HRRR.K.RHC..............",
+    "EBEBR.CRH..CR............",
+    "BBBBBB.RHC..C............",
+    ".OOOOBB.CRH..............",
+    "...OOOBBD.RHC............",
+    "....OOBBCR.DDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "......OBB.OD.......DBBB..",
+    ".....OB...DD........DOBB.",
+    "....OB....DD........DDOBB",
+    "....O......D........DD.OB",
+    "...O.......D.........D.OO",
+    "...........D...........O."
+  ],
+  walk2: [
+    "...O.A.CR................",
+    "..HHRR.RH................",
+    ".HRRR.KRHC...............",
+    "EBEBR.CRH.CR.............",
+    "BBBBBB.RHC.C.............",
+    ".OOOOBBCRH...............",
+    "...OOOBBD.RHC............",
+    "....OOBBCR.DDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD......DBBB..",
+    ".........BODD......DOBB..",
+    ".........BODD......DDOBB.",
+    ".........B.OD.......DD.OB",
+    ".........O.DD........D.OO",
+    ".........O..D..........O."
+  ],
+  eat: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "...O.A.CR.BBBDBBBBBBBBBOB",
+    "..HHRR.KRHCBOBBBBBBBBBBBO",
+    ".EBEBRHRR.CRD...LBBBBBBO.",
+    "EBEBB.RHC.OBOD.....DBBB..",
+    ".EEB...CR..BODD....DOBB..",
+    ".EE.....C..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "....O.A.CR...............",
+    "...HHRR.RH...............",
+    "..HRRR.KRHC..............",
+    ".EBEBR.CRH.CR...OBOBO....",
+    "EBEBR.RHC.CBBBOBBBBDBBBB.",
+    ".EEB.CRH.BBBBBBBBBBBBBBBB",
+    "..E.RHC.OBBBDBBBDBBBBBBBB",
+    "....CR.OBBBOBBBBBBBBBBBBO",
+    "....C.OBBOD....LBBBBBBO..",
+    ".....OBBOD.......DBBB....",
+    ".....SOODD.......DOBB....",
+    "........................."
+  ],
+  drink: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "...O.A.CR.BBBDBBBBBBBBBOB",
+    "..HHRR.KRHCBOBBBBBBBBBBBO",
+    ".EBEBRHRR.CRD...LBBBBBBO.",
+    "EBEBB.RHC.OBOD.....DBBB..",
+    ".EEB...CR..BODD....DOBB..",
+    ".EE.....C..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  happy: [
+    "...O.A..HHRR.............",
+    "..HHRR.HRRR.CR...........",
+    ".HRRR.KCRH..RH...........",
+    "EBEBR.RHC.RHC............",
+    "BBBBBB.CRH.CR............",
+    ".OOOOBB.RHC..............",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........BOD........DBBB..",
+    "........BOD.........DOB..",
+    ".........O..........DO...",
+    ".........................",
+    ".........................",
+    "........................."
+  ]
+};
+
+// ==========================================================================
 // PUDÚ BEBÉ / CERVATILLO (18x15) - Tierno, compacto y con pintas doradas
 // ==========================================================================
 export const FAWN_FRAMES = {
@@ -579,7 +746,11 @@ export const PUDU_COLOR_MAP = {
   'T': '#7ef6ea', // Miku Teal Brillo
   'Q': '#167a71', // Miku Teal Sombra
   'K': '#18181b', // Cinta Negra Futurista
-  'P': '#ff2a85'  // Detalle Magenta Neón
+  'P': '#ff2a85', // Detalle Magenta Neón
+  'R': '#e11d48', // Kasane Teto Red / Coral Base
+  'H': '#fda4af', // Teto Coral Brillo
+  'C': '#881337', // Teto Crimson Sombra Taladro
+  'A': '#fb7185'  // Teto Ahoge / Mechón
 };
 
 // Accesorios en la cabeza ajustados al nuevo tamaño de 25x21 y crías
