@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>El Refugio de los Pudús - Un Regalo del Bosque</title>
+  
+  <!-- Tipografías Cálidas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Barra Superior -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-icon">🦌</span>
+        <div class="brand-text">
+          <h1>El Refugio de los Pudús</h1>
+          <p class="subtitle">Bosque Valdiviano & Cosecha de Maquis</p>
+        </div>
+      </div>
+      <div class="top-controls">
+        <button id="btn-sound" class="btn-pill" title="Activar sonido ambiental de lluvia">
+          🌧️ Lluvia: OFF
+        </button>
+        <button id="btn-reset" class="btn-pill btn-subtle" title="Reiniciar partida">
+          🔄 Reiniciar
+        </button>
+      </div>
+    </header>
+
+    <!-- Marcador Central de Recursos -->
+    <section class="resource-banner">
+      <div class="counter-box">
+        <span class="resource-icon">🌰</span>
+        <div class="counter-data">
+          <div class="counter-number" id="maquis-count">0</div>
+          <div class="counter-rate">
+            <span id="maquis-rate">0/seg</span>
+            <span id="luck-indicator" class="luck-badge hidden">✨ Suerte x3</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Área Visual: Diorama del Bosque y Arbusto Interactivo -->
+    <main class="diorama-container">
+      <canvas id="diorama-canvas"></canvas>
+      <div class="diorama-hint">
+        <span>Toca el arbusto para cosechar maquis</span>
+      </div>
+
+      <!-- Cuadro Especial de Fase 1: Conocer al primer Pudú -->
+      <div id="box-fase-1" class="phase-card">
+        <div class="phase-card-inner">
+          <div class="phase-avatar">🦌</div>
+          <div class="phase-content">
+            <h4>¡Un pudú tímido se asoma entre las hojas!</h4>
+            <p>Se llama Pichi y tiene frío. Ofrécele maquis para ganarte su cariño.</p>
+            <div class="progress-bar-bg">
+              <div id="pudu-confianza-bar" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text" id="pudu-confianza-txt">Confianza: 0%</div>
+          </div>
+          <button id="btn-feed-pudu" class="cta-btn">Convidar (10 🌰)</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Panel Inferior: Pestañas de Progresión -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="cosecha">
+        <span class="tab-icon">🌾</span> Cosecha
+      </button>
+      <button class="tab-btn" data-tab="refugio">
+        <span class="tab-icon">🦌</span> El Refugio
+      </button>
+      <button class="tab-btn" data-tab="taller">
+        <span class="tab-icon">🏺</span> El Taller
+      </button>
+      <button class="tab-btn" data-tab="bitacora">
+        <span class="tab-icon">📜</span> Bitácora
+      </button>
+    </nav>
+
+    <section class="tab-panels">
+      <!-- Pestaña 1: Cosecha -->
+      <div id="tab-cosecha" class="tab-content">
+        <div id="tab-cosecha-list" class="cards-list"></div>
+      </div>
+
+      <!-- Pestaña 2: El Refugio de Pudús -->
+      <div id="tab-refugio" class="tab-content hidden">
+        <div id="tab-refugio-list"></div>
+      </div>
+
+      <!-- Pestaña 3: El Taller -->
+      <div id="tab-taller" class="tab-content hidden">
+        <div id="tab-taller-content"></div>
+      </div>
+
+      <!-- Pestaña 4: Bitácora & Picnic Final -->
+      <div id="tab-bitacora" class="tab-content hidden">
+        <div id="tab-bitacora-content"></div>
+      </div>
+    </section>
+
+    <!-- Modal de la Carta de Regalo Final -->
+    <div id="modal-regalo" class="modal-overlay hidden">
+      <div class="modal-letter">
+        <div class="letter-stamp">🍃</div>
+        <h2 id="carta-saludo" class="letter-title">Para ti</h2>
+        <div id="carta-parrafos" class="letter-body"></div>
+        <div class="letter-footer">
+          <p id="carta-despedida">Con mucho cariño,</p>
+          <h3 id="carta-firma">Tu persona favorita</h3>
+        </div>
+        <button id="btn-cerrar-carta" class="cta-btn">Guardar en mi corazón 💚</button>
+      </div>
+    </div>
+
+    <!-- Contenedor de Notificaciones Toast -->
+    <div id="notifications-container"></div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
