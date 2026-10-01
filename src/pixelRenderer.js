@@ -175,33 +175,40 @@ export const PUDU_FRAMES = {
     ".........O..D..........O."
   ],
 
-  // Cosechando / Comiendo bayas del suelo (Cabeza gacha hacia las hojas)
+  // Cosechando / Comiendo bayas del suelo (Cabeza gacha anatómica hacia el suelo y bayas)
   eat: [
     ".........................",
     ".........................",
     ".........................",
     ".........................",
     ".........................",
-    "....DDDDDDDDDBOBOBO......",
-    "...E..BBBBBOBOBBBBDBBBB..",
-    "..EBE..BBBBBBBBBBBBBBBBB.",
-    ".BBBB..BBBDBBBDBBBBBBBBBB",
-    "..OOOB.BBBBBBBBBBBBBBBBBB",
-    "...OOOBBBBBBBDBBBBBBBBBOB",
-    "....OOOBBBOBBBBBBBBBBBBBO",
-    ".....OBBOD....LBBBBBBO...",
-    ".....OBBOD.......DBBB....",
-    "......BODD.......DOBB....",
-    "......BODD.......DDOBB...",
-    "......BOD........DD.OB...",
-    "......ODB........D..OO...",
-    "......SO.........D...O...",
     ".........................",
-    "........................."
+    ".........................",
+    ".........DDDDDBOBOBO.....",
+    ".......DDBBBOBOBBBBDBBBB.",
+    "......DDBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "...OOBBBBBBBBDBBBBBBBBBOB",
+    "..EBBBBBOBBBOBBBBBBBBBBBO",
+    ".EBEBBOOBBOD....LBBBBBBO.",
+    "EBEBB..OBBOD.......DBBB..",
+    ".EEB....BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
   ],
 
-  // Durmiendo acurrucado en camita de musgo
+  // Durmiendo acurrucado en camita de musgo (apoyado fielmente en el suelo)
   sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
     ".........................",
     ".........................",
     ".........................",
@@ -215,14 +222,7 @@ export const PUDU_FRAMES = {
     "..DBBBBBBBOBBBBBBBBBBD...",
     "...DOOOBBBOBDDBBBBBBBD...",
     "....OOOOODDDDDLBBBBBBD...",
-    ".....OOOO......DDDDD.....",
-    ".........................",
-    ".........................",
-    ".........................",
-    ".........................",
-    ".........................",
-    ".........................",
-    "........................."
+    ".....OOOO......DDDDD....."
   ]
 };
 

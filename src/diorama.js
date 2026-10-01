@@ -598,15 +598,17 @@ export class ForestDiorama {
       const isFacingRight = p.direction > 0;
       drawPixelMatrix(ctx, matrix, PUDU_COLOR_MAP, p.x, p.y, 1, isFacingRight);
 
-      // Accesorio en la cabeza si no está durmiendo
+      // Accesorio en la cabeza si no está durmiendo (ajustado anatómicamente a la cabeza erguida o gacha)
       if (p.state !== 'sleep' && p.hat && ACCESSORY_SPRITES[p.hat]) {
         const hatColorMap = {
           'G': PALETTE.leafHighlight,
           'R': PALETTE.flowerRed,
           'Y': '#facc15'
         };
-        const hx = isFacingRight ? p.x + 17 : p.x + 3;
-        drawPixelMatrix(ctx, ACCESSORY_SPRITES[p.hat], hatColorMap, hx, p.y - 3, 1, isFacingRight);
+        const isEat = p.state === 'eat';
+        const hx = isFacingRight ? (isEat ? p.x + 14 : p.x + 17) : (isEat ? p.x + 4 : p.x + 3);
+        const hy = isEat ? p.y + 8 : p.y - 3;
+        drawPixelMatrix(ctx, ACCESSORY_SPRITES[p.hat], hatColorMap, hx, hy, 1, isFacingRight);
       }
 
       // Si duerme, mostrar 'Zzz' pixel
