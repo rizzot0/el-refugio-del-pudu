@@ -395,6 +395,9 @@ export class GameUI {
       } else if (p.tipo === 'mizuki' || p.sombrero === 'mizuki') {
         icon = '🎀';
         badgeExtra = 'pudu-badge-mizuki';
+      } else if (p.tipo === 'neru' || p.sombrero === 'neru') {
+        icon = '📱';
+        badgeExtra = 'pudu-badge-neru';
       } else if (p.sombrero === 'crown') icon = '👑';
       else if (p.sombrero === 'dewdrop') icon = '💧';
       else if (p.sombrero === 'copihue') icon = '🌸';

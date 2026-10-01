@@ -778,6 +778,173 @@ export const MIZUKI_PUDU_FRAMES = {
 };
 
 // ==========================================================================
+// PUDÚ AKITA NERU (25x21) - Boukaloid con coleta lateral rubia/dorada y celular
+// ==========================================================================
+export const NERU_PUDU_FRAMES = {
+  idle: [
+    "...O.O.XYU...............",
+    "..UUYY.XYUU..............",
+    ".UYYY.XJYYJ..............",
+    "EBEBY.JYYUJ..XF..........",
+    "BBBBBB.JYUJ..X...........",
+    ".OOOOBB.JYJ..............",
+    "...OOOBBD.J..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    ".......OBBOD.......DBBB..",
+    "........BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
+  ],
+  walk1: [
+    "...O.O..XYU..............",
+    "..UUYY..XYUU.............",
+    ".UYYY.X.JYYJ.............",
+    "EBEBY.JYYUJ..Y...........",
+    "BBBBBB.JYUJ..J...........",
+    ".OOOOBB.JYJ..............",
+    "...OOOBBD.J..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "......OBB.OD.......DBBB..",
+    ".....OB...DD........DOBB.",
+    "....OB....DD........DDOBB",
+    "....O......D........DD.OB",
+    "...O.......D.........D.OO",
+    "...........D...........O."
+  ],
+  walk2: [
+    "...O.O.XYU...............",
+    "..UUYY.XYUU..............",
+    ".UYYY.XJYYJ..............",
+    "EBEBY.JYYUJ..............",
+    "BBBBBB.JYUJ..............",
+    ".OOOOBB.JYJ..............",
+    "...OOOBBD.J..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD......DBBB..",
+    ".........BODD......DOBB..",
+    ".........BODD......DDOBB.",
+    ".........B.OD.......DD.OB",
+    ".........O.DD........D.OO",
+    ".........O..D..........O."
+  ],
+  eat: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "..O.O.XYU.BBBDBBBDBBBBBBB",
+    "..UUYY.XYUUBOBBBBBBBBBBBO",
+    ".EBEBYXJYY.VBD..LBBBBBBO.",
+    "EBEBB.JYUJ.OBOD....DBBB..",
+    ".EEB...JYJ.BODD....DOBB..",
+    ".EE.....J..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "....O.O.XYU..............",
+    "...UUYY.XYUU.............",
+    "..UYYY.XJYYJ.............",
+    ".EBEBY.JYYUJ....OBOBO....",
+    "EBEBY.JYUJ.BBBOBBBBDBBBB.",
+    ".EEB.JYJ.BBBBBBBBBBBBBBBB",
+    "..E..J..OBBBDBBBDBBBBBBBB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD.......DBBB.",
+    "........SOODD.......DOBB.",
+    "........................."
+  ],
+  drink: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "..O.O.XYU.BBBDBBBDBBBBBBB",
+    "..UUYY.XYUUBOBBBBBBBBBBBO",
+    ".EBEBYXJYY.VBD..LBBBBBBO.",
+    "EBEBB.JYUJ.OBOD....DBBB..",
+    ".EEB...JYJ.BODD....DOBB..",
+    ".EE.....J..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  happy: [
+    "...O.O..XYU..UY..........",
+    "..UUYY.XYUUJ.YUU.........",
+    ".UYYY.XYUUJ..JY..........",
+    "EBEBY.JYUJ.JYUJ..XF......",
+    "BBBBBB.JYJ..JYJ...X......",
+    ".OOOOBB.J................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........BOD........DBBB..",
+    "........BOD.........DOB..",
+    ".........O..........DO...",
+    ".........................",
+    ".........................",
+    "........................."
+  ]
+};
+
+// ==========================================================================
 // PUDÚ BEBÉ / CERVATILLO (18x15) - Tierno, compacto y con pintas doradas
 // ==========================================================================
 export const FAWN_FRAMES = {
@@ -922,7 +1089,12 @@ export const PUDU_COLOR_MAP = {
   'I': '#fdf2f8', // Mizuki Pink Brillo / Iluminación
   'V': '#be185d', // Mizuki Mauve / Sombra Rosa
   'N': '#1e1b4b', // Mizuki Nightcord Navy Ribbon
-  'W': '#c7d2fe'  // Mizuki Lavender Ribbon Knot / Accent
+  'W': '#c7d2fe', // Mizuki Lavender Ribbon Knot / Accent
+  'Y': '#facc15', // Neru Gold / Yellow Base
+  'U': '#fef08a', // Neru Pale Yellow Highlight
+  'J': '#b45309', // Neru Dark Amber Shadow
+  'X': '#0f172a', // Neru Black Tie / Scrunchie & Phone Case
+  'F': '#38bdf8'  // Neru Phone Screen Cyan Glow
 };
 
 // Accesorios en la cabeza ajustados al nuevo tamaño de 25x21 y crías

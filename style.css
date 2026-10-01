@@ -694,6 +694,15 @@ body {
   color: #f472b6;
 }
 
+.pudu-badge-neru {
+  border-color: rgba(250, 204, 21, 0.45);
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.pudu-badge-neru strong {
+  color: #facc15;
+}
+
 .pudu-hat {
   font-size: 18px;
 }

@@ -11,6 +11,7 @@ import {
   MIKU_PUDU_FRAMES,
   TETO_PUDU_FRAMES,
   MIZUKI_PUDU_FRAMES,
+  NERU_PUDU_FRAMES,
   FAWN_FRAMES,
   PUDU_COLOR_MAP,
   CHUCAO_SPRITES,
@@ -230,6 +231,9 @@ export class ForestDiorama {
     } else if (pudu.tipo === 'mizuki') {
       msg = "¡Mizuki sonríe! 🎀✨";
       textColor = "#f472b6";
+    } else if (pudu.tipo === 'neru') {
+      msg = "Neru: '¡No me molestes...! 📱💛'";
+      textColor = "#facc15";
     } else if (pudu.tipo === 'fawn') {
       msg = "¡Cervatillo feliz! 💕";
       textColor = "#f472b6";
@@ -770,6 +774,7 @@ export class ForestDiorama {
       const isMiku = p.tipo === 'miku';
       const isTeto = p.tipo === 'teto';
       const isMizuki = p.tipo === 'mizuki';
+      const isNeru = p.tipo === 'neru';
       let frameSet = PUDU_FRAMES;
       if (isFawn) {
         frameSet = FAWN_FRAMES;
@@ -779,6 +784,8 @@ export class ForestDiorama {
         frameSet = TETO_PUDU_FRAMES;
       } else if (isMizuki) {
         frameSet = MIZUKI_PUDU_FRAMES;
+      } else if (isNeru) {
+        frameSet = NERU_PUDU_FRAMES;
       }
       let matrix = frameSet.idle;
 
@@ -814,8 +821,8 @@ export class ForestDiorama {
       const isFacingRight = p.direction > 0;
       drawPixelMatrix(ctx, matrix, PUDU_COLOR_MAP, p.x, p.y, 1, isFacingRight);
 
-      // Accesorio en la cabeza si no está durmiendo (Miku, Teto y Mizuki ya poseen peinados exclusivos)
-      if (p.state !== 'sleep' && !isMiku && !isTeto && !isMizuki && p.hat && ACCESSORY_SPRITES[p.hat]) {
+      // Accesorio en la cabeza si no está durmiendo (Miku, Teto, Mizuki y Neru ya poseen peinados exclusivos)
+      if (p.state !== 'sleep' && !isMiku && !isTeto && !isMizuki && !isNeru && p.hat && ACCESSORY_SPRITES[p.hat]) {
         const hatColorMap = {
           'G': PALETTE.leafHighlight,
           'R': PALETTE.flowerRed,

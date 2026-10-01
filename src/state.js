@@ -267,7 +267,8 @@ export const INITIAL_STATE = {
     { id: "pudu_1", nombre: "Pichi", tipo: "adult", rol: "El primer explorador", humor: "Curioso y regalón", sombrero: "leaf" },
     { id: "pudu_miku", nombre: "Miku-Pudú", tipo: "miku", rol: "Diva vocalista del bosque", humor: "Alegre y cantarina", sombrero: "miku" },
     { id: "pudu_teto", nombre: "Teto-Pudú", tipo: "teto", rol: "Quimera de los taladros rojos", humor: "Entusiasta y fan del pan", sombrero: "teto" },
-    { id: "pudu_mizuki", nombre: "Mizuki-Pudú", tipo: "mizuki", rol: "Creadora de videos de 25-ji", humor: "Libre, estilosa y tierna", sombrero: "mizuki" }
+    { id: "pudu_mizuki", nombre: "Mizuki-Pudú", tipo: "mizuki", rol: "Creadora de videos de 25-ji", humor: "Libre, estilosa y tierna", sombrero: "mizuki" },
+    { id: "pudu_neru", nombre: "Neru-Pudú", tipo: "neru", rol: "Tsundere fan del celular", humor: "Revisando sus mensajes", sombrero: "neru" }
   ],
 
   // Lista de nombres disponibles para los pudús y cervatillos que se van uniendo
