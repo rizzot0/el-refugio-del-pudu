@@ -1,21 +1,18 @@
 /**
  * Motor de Renderizado Pixel Art Procedural para "El Refugio de los Pudús"
  * Proporciona matrices de píxeles, paletas auténticas del bosque valdiviano
- * y dibujado nítido con escalado entero (pixel-perfect).
+ * basadas en el sprite de referencia de ciervo/pudú con pintas doradas y patas esbeltas.
  */
 
-// Paleta Maestra Pixel Art (Inspirada en la naturaleza del sur de Chile)
+// Paleta Maestra Pixel Art
 export const PALETTE = {
-  // Pudú
-  puduDark: "#3a1a0e",
-  puduBody: "#753920",
-  puduLight: "#964c2d",
-  puduBelly: "#c4734d",
-  puduSnout: "#1b0a05",
-  puduEye: "#120502",
-  puduCheek: "#f43f5e",
-  puduHoof: "#241008",
-  puduWhite: "#ffffff",
+  // Pudú (Extraído directamente de la referencia de arte)
+  puduSnout: "#211c2e",   // 'E': Hocico y ojo carbón
+  puduOchre: "#c27a23",   // 'O': Contorno dorado/ocre del cuello, orejas y pintas de cervatillo
+  puduBody: "#734c3e",    // 'B': Pelaje castaño rojizo principal
+  puduDark: "#4b2e25",    // 'D': Lomo oscuro y patas traseras sombreadas
+  puduLight: "#9c7467",   // 'L': Vientre pálido
+  puduShadow: "#33453e",  // 'S': Sombra proyectada
 
   // Flora y Árboles
   trunkDark: "#301d13",
@@ -42,7 +39,6 @@ export const PALETTE = {
   waterDark: "#0284c7",
   waterMid: "#38bdf8",
   waterLight: "#bae6fd",
-  waterFoam: "#ffffff",
 
   // Chucao
   chucaoBack: "#362e29",
@@ -63,7 +59,7 @@ export const PALETTE = {
 };
 
 /**
- * Dibuja un sprite definido en matriz de píxeles (array de strings o índices).
+ * Dibuja un sprite definido en matriz de píxeles con escalado nítido
  */
 export function drawPixelMatrix(ctx, matrix, colorMap, x, y, scale = 1, flipX = false) {
   const h = matrix.length;
@@ -92,147 +88,179 @@ export function drawPixelMatrix(ctx, matrix, colorMap, x, y, scale = 1, flipX = 
 }
 
 /* ==========================================================================
-   MATRICES DE SPRITES PIXEL ART (16x16 / 20x16 / 24x20)
+   MATRICES DE SPRITES DEL PUDÚ (25x21) - IDÉNTICAS AL ESTILO DE REFERENCIA
    ========================================================================== */
 
-// 1. SPRITES DEL PUDÚ (18 de ancho x 14 de alto)
 // '.' = transparente
-// 'D' = puduDark, 'B' = puduBody, 'L' = puduLight, 'M' = puduBelly
-// 'S' = snout, 'E' = eye, 'W' = white, 'H' = hoof, 'C' = cheek
+// 'O' = puduOchre (contorno dorado/ocre, orejas y manchas)
+// 'B' = puduBody (castaño rojizo del pudú)
+// 'D' = puduDark (lomo y patas secundarias oscuras)
+// 'L' = puduLight (vientre claro)
+// 'E' = puduSnout (hocico y ojo)
+// 'S' = puduShadow (sombra)
+
 export const PUDU_FRAMES = {
-  // Idle (Reposo respirando)
+  // Idle (Reposo fiel al arte de referencia)
   idle: [
-    "....DD............",
-    "...DLDD...........",
-    "..DLLEEE..DDDD....",
-    "..DLLLEW.DBBBBD...",
-    "...DSSS.DBBBBBBD..",
-    ".......DBBBBBBBBD.",
-    "......DBBLMMMBBBD.",
-    ".....DBBLLMMMBBBD.",
-    ".....DBBBLLMMBBDD.",
-    "......DBBBBBBBBD..",
-    ".......DBBBDBBD...",
-    ".......HDDH.HDDH..",
-    ".......HHH..HHH..."
+    "...O.O...................",
+    "..BBBB...................",
+    ".BBBBB...................",
+    "EBEBBB...................",
+    "BBBBBBB..................",
+    ".OOOOBBB.................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    ".......OBBOD.......DBBB..",
+    "........BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
   ],
 
-  // Trote Cuadro 1 (Patas estiradas)
+  // Trote Cuadro 1 (Pata delantera extendida, trasera impulsando)
   walk1: [
-    "....DD............",
-    "...DLDD...........",
-    "..DLLEEE..DDDD....",
-    "..DLLLEW.DBBBBD...",
-    "...DSSS.DBBBBBBD..",
-    ".......DBBBBBBBBD.",
-    "......DBBLMMMBBBD.",
-    ".....DBBLLMMMBBBD.",
-    "....HDBBLLMMBBD...",
-    "...HH.DBBBBBBBD.H.",
-    ".......DD..DDB.HH.",
-    "............DD....",
-    ".................."
+    "...O.O...................",
+    "..BBBB...................",
+    ".BBBBB...................",
+    "EBEBBB...................",
+    "BBBBBBB..................",
+    ".OOOOBBB.................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "......OBB.OD.......DBBB..",
+    ".....OB...DD........DOBB.",
+    "....OB....DD........DDOBB",
+    "....O......D........DD.OB",
+    "...O.......D.........D.OO",
+    "...........D...........O."
   ],
 
-  // Trote Cuadro 2 (Patas recogidas)
+  // Trote Cuadro 2 (Patas recogidas en el paso)
   walk2: [
-    "....DD............",
-    "...DLDD...........",
-    "..DLLEEE..DDDD....",
-    "..DLLLEW.DBBBBD...",
-    "...DSSS.DBBBBBBD..",
-    ".......DBBBBBBBBD.",
-    "......DBBLMMMBBBD.",
-    ".....DBBLLMMMBBBD.",
-    ".....DBBBLLMMBBDD.",
-    "......DBB..DBBD...",
-    "......HDH..HDDH...",
-    "......HH....HH....",
-    ".................."
+    "...O.O...................",
+    "..BBBB...................",
+    ".BBBBB...................",
+    "EBEBBB...................",
+    "BBBBBBB..................",
+    ".OOOOBBB.................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD......DBBB..",
+    ".........BODD......DOBB..",
+    ".........BODD......DDOBB.",
+    ".........B.OD.......DD.OB",
+    ".........O.DD........D.OO",
+    ".........O..D..........O."
   ],
 
-  // Durmiendo acurrucado (En camita de musgo)
-  sleep: [
-    "..................",
-    "..................",
-    "..................",
-    "..................",
-    ".......DDDD.......",
-    ".....DDLLLLDD.....",
-    "...DDLLBBBBLLDD...",
-    "..DLLEEEBBBBBBLD..",
-    "..DSSSSEBBBBBBBBD.",
-    "..DDSSBBBBBBBBBBD.",
-    "...DDBBBBBBBBBBD..",
-    "....DDDDBBDDDD....",
-    ".......HHHH......."
-  ],
-
-  // Comiendo / Cosechando (Cabeza hacia abajo)
+  // Cosechando / Comiendo bayas del suelo (Cabeza gacha hacia las hojas)
   eat: [
-    "..................",
-    "..........DDDD....",
-    ".........DBBBBD...",
-    "....DD..DBBBBBBD..",
-    "...DLDDDBBBBBBBBD.",
-    "..DLLEEDBBLMMMBBBD",
-    "..DLLLEWBBLLMMMBBD",
-    "...DSSSDBBBLLMMBD.",
-    "....SSS.DBBBBBBD..",
-    ".........DBBBDBD..",
-    ".........HDDHHDDH.",
-    ".........HHH..HHH.",
-    ".................."
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "....DDDDDDDDDBOBOBO......",
+    "...E..BBBBBOBOBBBBDBBBB..",
+    "..EBE..BBBBBBBBBBBBBBBBB.",
+    ".BBBB..BBBDBBBDBBBBBBBBBB",
+    "..OOOB.BBBBBBBBBBBBBBBBBB",
+    "...OOOBBBBBBBDBBBBBBBBBOB",
+    "....OOOBBBOBBBBBBBBBBBBBO",
+    ".....OBBOD....LBBBBBBO...",
+    ".....OBBOD.......DBBB....",
+    "......BODD.......DOBB....",
+    "......BODD.......DDOBB...",
+    "......BOD........DD.OB...",
+    "......ODB........D..OO...",
+    "......SO.........D...O...",
+    ".........................",
+    "........................."
+  ],
+
+  // Durmiendo acurrucado en camita de musgo
+  sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".......DDDDDDDD..........",
+    "....DDDBBBOBOBBDDDD......",
+    "...DBBBBBBOBOBBBBBDD.....",
+    "..DBBOBBBBBBBBBBBBBBD....",
+    "..DBOEBEBBBBBBDBBBBBBD...",
+    "..DBBBBBBBOBBBBBBBBBBD...",
+    "...DOOOBBBOBDDBBBBBBBD...",
+    "....OOOOODDDDDLBBBBBBD...",
+    ".....OOOO......DDDDD.....",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........................."
   ]
 };
 
-// Mapa de colores para Pudú
 export const PUDU_COLOR_MAP = {
-  'D': PALETTE.puduDark,
+  'O': PALETTE.puduOchre,
   'B': PALETTE.puduBody,
+  'D': PALETTE.puduDark,
   'L': PALETTE.puduLight,
-  'M': PALETTE.puduBelly,
-  'S': PALETTE.puduSnout,
-  'E': PALETTE.puduEye,
-  'W': PALETTE.puduWhite,
-  'H': PALETTE.puduHoof,
-  'C': PALETTE.puduCheek
+  'E': PALETTE.puduSnout,
+  'S': PALETTE.puduShadow
 };
 
-// 2. ACCESORIOS PIXEL ART PARA PUDÚS
+// Accesorios en la cabeza ajustados al nuevo tamaño de 25x21
 export const ACCESSORY_SPRITES = {
-  // Hoja verde en la cabeza
   leaf: [
     "....G...",
     "...GGG..",
     "..GGGG..",
-    "...GG...",
-    "....G..."
+    "...GG..."
   ],
-  // Flor de Copihue
   copihue: [
-    "...RR...",
-    "..RRRR..",
-    ".RRRRRR.",
-    "..RRRR..",
-    "...YY..."
+    "..RR..",
+    ".RRRR.",
+    ".RRRR.",
+    "..YY.."
   ],
-  // Chupalla de paja
   chupalla: [
-    "....YY....",
     "..YYYYYY..",
     ".YYYYYYYY.",
     "YYYYYYYYYY"
   ],
-  // Bufandita de lana
   scarf: [
     "RRRRRRRR",
-    "RRR..RRR",
-    "RR....RR"
+    "RRR..RRR"
   ]
 };
 
-// 3. SPRITE DEL CHUCAO PIXEL ART (12x10)
+// Chucao
 export const CHUCAO_SPRITES = {
   fly1: [
     "..BB........",
@@ -242,8 +270,7 @@ export const CHUCAO_SPRITES = {
     ".COOOBBB....",
     "..OOOBB.....",
     "...OOB......",
-    "....YY......",
-    "............"
+    "....YY......"
   ],
   fly2: [
     "............",
@@ -253,8 +280,7 @@ export const CHUCAO_SPRITES = {
     ".COOOBBB....",
     "..OOOB......",
     "...OOB......",
-    "....YY......",
-    "............"
+    "....YY......"
   ]
 };
 
@@ -266,7 +292,7 @@ export const CHUCAO_COLOR_MAP = {
   'Y': '#facc15'
 };
 
-// 4. SPRITE DEL MONITO DEL MONTE (12x10)
+// Monito del Monte
 export const MONITO_SPRITE = [
   "...FFFF.....",
   "..FFFFFF....",
@@ -276,8 +302,7 @@ export const MONITO_SPRITE = [
   "...LLLL.....",
   "...T.T......",
   "..TT.TT.....",
-  ".TT...TT....",
-  "TT.....TT..."
+  ".TT...TT...."
 ];
 
 export const MONITO_COLOR_MAP = {
@@ -287,7 +312,7 @@ export const MONITO_COLOR_MAP = {
   'T': PALETTE.trunkDark
 };
 
-// 5. CAMITA DE MUSGO PIXEL ART (20x8)
+// Camita de Musgo
 export const MOSS_BED_SPRITE = [
   ".....GGGGGGGGGG.....",
   "...GGGGMMMMMMGGGG...",
@@ -302,10 +327,10 @@ export const MOSS_BED_SPRITE = [
 export const MOSS_BED_COLOR_MAP = {
   'G': PALETTE.groundDark,
   'M': PALETTE.groundMoss,
-  'Y': '#ca8a04' // Hoja suave de relleno
+  'Y': '#ca8a04'
 };
 
-// 6. OLLA DE GREDA Y FUEGO (16x14)
+// Olla de Greda
 export const CLAY_POT_SPRITE = [
   "......CCCC......",
   "....CCCCCCCC....",
@@ -326,12 +351,12 @@ export const CLAY_POT_SPRITE = [
 export const CLAY_POT_COLOR_MAP = {
   'C': PALETTE.clayMid,
   'D': PALETTE.clayDark,
-  'S': '#4b5563', // Piedras
+  'S': '#4b5563',
   'F': PALETTE.fireOrange,
   'Y': PALETTE.fireYellow
 };
 
-// 7. BROTE DE MAQUI JOVEN (10x12)
+// Brote de Maqui
 export const SPROUT_SPRITE = [
   "....GG....",
   "...GGGG...",
@@ -342,9 +367,7 @@ export const SPROUT_SPRITE = [
   "....TT....",
   "...GTTG...",
   "..GGTTGG..",
-  "..GGTTGG..",
-  "...DDDD...",
-  ".........."
+  "...DDDD..."
 ];
 
 export const SPROUT_COLOR_MAP = {

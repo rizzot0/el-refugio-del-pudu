@@ -104,9 +104,9 @@ export class ForestDiorama {
       this.pudusVisuales.push({
         id: pData ? pData.id : `p_${i}`,
         nombre: pData ? pData.nombre : `Pudú ${i + 1}`,
-        x: 40 + (i * 38) % (this.virtualWidth - 80),
-        y: this.virtualHeight - 42 - (i % 2) * 14,
-        baseY: this.virtualHeight - 42 - (i % 2) * 14,
+        x: 35 + (i * 42) % (this.virtualWidth - 80),
+        y: this.virtualHeight - 64 - (i % 2) * 8,
+        baseY: this.virtualHeight - 64 - (i % 2) * 8,
         vx: (Math.random() - 0.5) * 0.45,
         direction: Math.random() > 0.5 ? 1 : -1,
         state: 'idle', // 'idle' | 'walk' | 'eat' | 'sleep' | 'pet'
@@ -333,12 +333,12 @@ export class ForestDiorama {
 
         if (pudu.state === 'walk') {
           pudu.x += pudu.vx;
-          if (pudu.x < 24) {
-            pudu.x = 24;
+          if (pudu.x < 16) {
+            pudu.x = 16;
             pudu.vx = Math.abs(pudu.vx);
             pudu.direction = 1;
-          } else if (pudu.x > this.virtualWidth - 36) {
-            pudu.x = this.virtualWidth - 36;
+          } else if (pudu.x > this.virtualWidth - 42) {
+            pudu.x = this.virtualWidth - 42;
             pudu.vx = -Math.abs(pudu.vx);
             pudu.direction = -1;
           }
@@ -589,8 +589,14 @@ export class ForestDiorama {
         matrix = PUDU_FRAMES.sleep;
       }
 
-      // Dibujar sprite de pudú con escala 1 y dirección
-      drawPixelMatrix(ctx, matrix, PUDU_COLOR_MAP, p.x, p.y, 1, p.direction < 0);
+      // Sombra pixel en el suelo estilo referencia
+      ctx.fillStyle = PALETTE.puduShadow;
+      ctx.fillRect(Math.floor(p.x + 3), Math.floor(p.y + 18), 18, 3);
+
+      // Dibujar sprite de pudú: original mira hacia la izquierda.
+      // Si direction > 0 (mira a la derecha), se invierte horizontalmente.
+      const isFacingRight = p.direction > 0;
+      drawPixelMatrix(ctx, matrix, PUDU_COLOR_MAP, p.x, p.y, 1, isFacingRight);
 
       // Accesorio en la cabeza si no está durmiendo
       if (p.state !== 'sleep' && p.hat && ACCESSORY_SPRITES[p.hat]) {
@@ -599,15 +605,15 @@ export class ForestDiorama {
           'R': PALETTE.flowerRed,
           'Y': '#facc15'
         };
-        const hx = p.direction > 0 ? p.x + 8 : p.x + 2;
-        drawPixelMatrix(ctx, ACCESSORY_SPRITES[p.hat], hatColorMap, hx, p.y - 4, 1);
+        const hx = isFacingRight ? p.x + 17 : p.x + 3;
+        drawPixelMatrix(ctx, ACCESSORY_SPRITES[p.hat], hatColorMap, hx, p.y - 3, 1, isFacingRight);
       }
 
       // Si duerme, mostrar 'Zzz' pixel
       if (p.state === 'sleep') {
         ctx.fillStyle = '#bae6fd';
         ctx.font = '7px sans-serif';
-        ctx.fillText("Zzz", Math.floor(p.x + 8), Math.floor(p.y - 4));
+        ctx.fillText("Zzz", Math.floor(p.x + 10), Math.floor(p.y - 4));
       }
     }
   }
