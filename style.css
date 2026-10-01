@@ -685,6 +685,15 @@ body {
   color: #fb7185;
 }
 
+.pudu-badge-mizuki {
+  border-color: rgba(244, 114, 182, 0.45);
+  background: rgba(244, 114, 182, 0.08);
+}
+
+.pudu-badge-mizuki strong {
+  color: #f472b6;
+}
+
 .pudu-hat {
   font-size: 18px;
 }

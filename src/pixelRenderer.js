@@ -611,6 +611,173 @@ export const TETO_PUDU_FRAMES = {
 };
 
 // ==========================================================================
+// PUDÚ MIZUKI AKIYAMA (25x21) - Project Sekai 25-ji con coleta lateral rosa y lazo
+// ==========================================================================
+export const MIZUKI_PUDU_FRAMES = {
+  idle: [
+    "...O.O.NWZ...............",
+    "..IIZZ.NZIZ..............",
+    ".IZZZ.NWZZV..............",
+    "EBEBZ.VZZIV..............",
+    "BBBBBB.VZIV..............",
+    ".OOOOBB.VZV..............",
+    "...OOOBBD.V..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    ".......OBBOD.......DBBB..",
+    "........BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
+  ],
+  walk1: [
+    "...O.O..NWZ..............",
+    "..IIZZ..NZIZ.............",
+    ".IZZZ.N.WZZV.............",
+    "EBEBZ.VZZIV..Z...........",
+    "BBBBBB.VZIV..V...........",
+    ".OOOOBB.VZV..............",
+    "...OOOBBD.V..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "......OBB.OD.......DBBB..",
+    ".....OB...DD........DOBB.",
+    "....OB....DD........DDOBB",
+    "....O......D........DD.OB",
+    "...O.......D.........D.OO",
+    "...........D...........O."
+  ],
+  walk2: [
+    "...O.O.NWZ...............",
+    "..IIZZ.NZIZ..............",
+    ".IZZZ.NWZZV..............",
+    "EBEBZ.VZZIV..............",
+    "BBBBBB.VZIV..............",
+    ".OOOOBB.VZV..............",
+    "...OOOBBD.V..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD......DBBB..",
+    ".........BODD......DOBB..",
+    ".........BODD......DDOBB.",
+    ".........B.OD.......DD.OB",
+    ".........O.DD........D.OO",
+    ".........O..D..........O."
+  ],
+  eat: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "..O.O.NWZ.BBBDBBBBBBBBBOB",
+    "..IIZZ.NZIZBOBBBBBBBBBBBO",
+    ".EBEBZNWZZ.VBD..LBBBBBBO.",
+    "EBEBB.VZIV.OBOD....DBBB..",
+    ".EEB...VZV.BODD....DOBB..",
+    ".EE.....V..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "....O.O.NWZ..............",
+    "...IIZZ.NZIZ.............",
+    "..IZZZ.NWZZV.............",
+    ".EBEBZ.VZZIV....OBOBO....",
+    "EBEBZ.VZIV.BBBOBBBBDBBBB.",
+    ".EEB.VZV.BBBBBBBBBBBBBBBB",
+    "..E..V..OBBBDBBBDBBBBBBBB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD.......DBBB.",
+    "........SOODD.......DOBB.",
+    "........................."
+  ],
+  drink: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "..O.O.NWZ.BBBDBBBDBBBBBBB",
+    "..IIZZ.NZIZBOBBBBBBBBBBBO",
+    ".EBEBZNWZZ.VBD..LBBBBBBO.",
+    "EBEBB.VZIV.OBOD....DBBB..",
+    ".EEB...VZV.BODD....DOBB..",
+    ".EE.....V..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  happy: [
+    "...O.O..NWZ..IZ..........",
+    "..IIZZ.NWZZV.ZIZ.........",
+    ".IZZZ.NWZIV..VZ..........",
+    "EBEBZ.VZIV.VZIV..........",
+    "BBBBBB.VZV..VZV..........",
+    ".OOOOBB.V................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........BOD........DBBB..",
+    "........BOD.........DOB..",
+    ".........O..........DO...",
+    ".........................",
+    ".........................",
+    "........................."
+  ]
+};
+
+// ==========================================================================
 // PUDÚ BEBÉ / CERVATILLO (18x15) - Tierno, compacto y con pintas doradas
 // ==========================================================================
 export const FAWN_FRAMES = {
@@ -750,7 +917,12 @@ export const PUDU_COLOR_MAP = {
   'R': '#e11d48', // Kasane Teto Red / Coral Base
   'H': '#fda4af', // Teto Coral Brillo
   'C': '#881337', // Teto Crimson Sombra Taladro
-  'A': '#fb7185'  // Teto Ahoge / Mechón
+  'A': '#fb7185', // Teto Ahoge / Mechón
+  'Z': '#f472b6', // Mizuki Soft Pink Base
+  'I': '#fdf2f8', // Mizuki Pink Brillo / Iluminación
+  'V': '#be185d', // Mizuki Mauve / Sombra Rosa
+  'N': '#1e1b4b', // Mizuki Nightcord Navy Ribbon
+  'W': '#c7d2fe'  // Mizuki Lavender Ribbon Knot / Accent
 };
 
 // Accesorios en la cabeza ajustados al nuevo tamaño de 25x21 y crías

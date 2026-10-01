@@ -266,12 +266,13 @@ export const INITIAL_STATE = {
   pudus: [
     { id: "pudu_1", nombre: "Pichi", tipo: "adult", rol: "El primer explorador", humor: "Curioso y regalón", sombrero: "leaf" },
     { id: "pudu_miku", nombre: "Miku-Pudú", tipo: "miku", rol: "Diva vocalista del bosque", humor: "Alegre y cantarina", sombrero: "miku" },
-    { id: "pudu_teto", nombre: "Teto-Pudú", tipo: "teto", rol: "Quimera de los taladros rojos", humor: "Entusiasta y fan del pan", sombrero: "teto" }
+    { id: "pudu_teto", nombre: "Teto-Pudú", tipo: "teto", rol: "Quimera de los taladros rojos", humor: "Entusiasta y fan del pan", sombrero: "teto" },
+    { id: "pudu_mizuki", nombre: "Mizuki-Pudú", tipo: "mizuki", rol: "Creadora de videos de 25-ji", humor: "Libre, estilosa y tierna", sombrero: "mizuki" }
   ],
 
   // Lista de nombres disponibles para los pudús y cervatillos que se van uniendo
   nombresDisponibles: [
-    { nombre: "Mizuki-Pudú", tipo: "adult", rol: "Estilista nocturna de lazos", sombrero: "dewdrop" },
+    { nombre: "Colo-Colo", tipo: "adult", rol: "Explorador de colinas altas", sombrero: "leaf" },
     { nombre: "Pewencito", tipo: "fawn", rol: "Cervatillo juguetón", sombrero: "dewdrop" },
     { nombre: "Rayén", tipo: "adult", rol: "Cuidaperlas del bosque", sombrero: "copihue" },
     { nombre: "Antu", tipo: "adult", rol: "Vigía de los rayos de sol", sombrero: "chupalla" },
