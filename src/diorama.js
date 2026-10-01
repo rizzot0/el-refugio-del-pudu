@@ -8,6 +8,7 @@ import {
   PALETTE,
   drawPixelMatrix,
   PUDU_FRAMES,
+  MIKU_PUDU_FRAMES,
   FAWN_FRAMES,
   PUDU_COLOR_MAP,
   CHUCAO_SPRITES,
@@ -215,8 +216,11 @@ export class ForestDiorama {
       });
     }
 
-    const msg = pudu.tipo === 'fawn' ? "¡Cervatillo feliz! 💕" : "¡Pudú feliz! 💕";
-    this.addFloatingText(msg, pudu.x + 8, pudu.y - 12, '#f472b6', 10);
+    const msg = pudu.tipo === 'miku'
+      ? "¡Miku canta! 🎵✨"
+      : (pudu.tipo === 'fawn' ? "¡Cervatillo feliz! 💕" : "¡Pudú feliz! 💕");
+    const textColor = pudu.tipo === 'miku' ? '#39c5bb' : '#f472b6';
+    this.addFloatingText(msg, pudu.x + 8, pudu.y - 12, textColor, 10);
   }
 
   // Clic en la Ranita de Darwin
@@ -749,7 +753,13 @@ export class ForestDiorama {
   drawPixelPudus(ctx) {
     for (const p of this.pudusVisuales) {
       const isFawn = p.tipo === 'fawn';
-      const frameSet = isFawn ? FAWN_FRAMES : PUDU_FRAMES;
+      const isMiku = p.tipo === 'miku';
+      let frameSet = PUDU_FRAMES;
+      if (isFawn) {
+        frameSet = FAWN_FRAMES;
+      } else if (isMiku) {
+        frameSet = MIKU_PUDU_FRAMES;
+      }
       let matrix = frameSet.idle;
 
       if (p.state === 'walk') {
@@ -784,8 +794,8 @@ export class ForestDiorama {
       const isFacingRight = p.direction > 0;
       drawPixelMatrix(ctx, matrix, PUDU_COLOR_MAP, p.x, p.y, 1, isFacingRight);
 
-      // Accesorio en la cabeza si no está durmiendo
-      if (p.state !== 'sleep' && p.hat && ACCESSORY_SPRITES[p.hat]) {
+      // Accesorio en la cabeza si no está durmiendo (Miku ya posee sus coletas exclusivas)
+      if (p.state !== 'sleep' && !isMiku && p.hat && ACCESSORY_SPRITES[p.hat]) {
         const hatColorMap = {
           'G': PALETTE.leafHighlight,
           'R': PALETTE.flowerRed,

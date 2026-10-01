@@ -667,6 +667,15 @@ body {
   gap: 2px;
 }
 
+.pudu-badge-miku {
+  border-color: rgba(57, 197, 187, 0.45);
+  background: rgba(57, 197, 187, 0.08);
+}
+
+.pudu-badge-miku strong {
+  color: #7ef6ea;
+}
+
 .pudu-hat {
   font-size: 18px;
 }

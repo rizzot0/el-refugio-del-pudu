@@ -35,6 +35,15 @@ export class SaveManager {
         }
       };
 
+      // Asegurar que si hay pudús nuevos en INITIAL_STATE (como Miku-Pudú), se sincronicen
+      if (Array.isArray(state.data.pudus)) {
+        INITIAL_STATE.pudus.forEach(initP => {
+          if (!state.data.pudus.some(p => p.id === initP.id || p.tipo === initP.tipo)) {
+            state.data.pudus.push(initP);
+          }
+        });
+      }
+
       // Calcular progreso offline (hasta un máximo de 6 horas)
       const ahora = Date.now();
       const deltaOfflineSegundos = Math.min(6 * 3600, Math.max(0, (ahora - (loaded.ultimoGuardado || ahora)) / 1000));

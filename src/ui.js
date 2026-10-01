@@ -384,10 +384,20 @@ export class GameUI {
     const pudusGrid = document.createElement('div');
     pudusGrid.className = 'pudus-grid';
     s.pudus.forEach(p => {
+      let icon = '🍂';
+      if (p.tipo === 'miku' || p.sombrero === 'miku') icon = '🎤';
+      else if (p.sombrero === 'crown') icon = '👑';
+      else if (p.sombrero === 'dewdrop') icon = '💧';
+      else if (p.sombrero === 'copihue') icon = '🌸';
+      else if (p.sombrero === 'chupalla') icon = '🌾';
+      else if (p.sombrero === 'scarf') icon = '🧣';
+      else if (p.sombrero === 'leaf') icon = '🍃';
+      else if (p.tipo === 'fawn') icon = '🦌';
+
       const card = document.createElement('div');
-      card.className = 'pudu-badge';
+      card.className = `pudu-badge ${p.tipo === 'miku' ? 'pudu-badge-miku' : ''}`;
       card.innerHTML = `
-        <span class="pudu-hat">${p.sombrero || '🍂'}</span>
+        <span class="pudu-hat">${icon}</span>
         <strong>${p.nombre}</strong>
         <small>${p.rol}</small>
       `;

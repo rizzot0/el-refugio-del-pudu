@@ -277,6 +277,173 @@ export const PUDU_FRAMES = {
 };
 
 // ==========================================================================
+// PUDÚ HATSUNE MIKU (25x21) - Diva vocalista del bosque con colitas turquesa
+// ==========================================================================
+export const MIKU_PUDU_FRAMES = {
+  idle: [
+    "...O.O.QM................",
+    "..TTMM.TM................",
+    ".TMMM.KPQM...............",
+    "EBEBM.QMMQM..............",
+    "BBBBBB.QTMQ..............",
+    ".OOOOBB.QTM..............",
+    "...OOOBBDQMM.............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    ".......OBBOD.......DBBB..",
+    "........BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
+  ],
+  walk1: [
+    "...O.O..QM...............",
+    "..TTMM..TM...............",
+    ".TMMM.KP.QM..............",
+    "EBEBM.QMM.QM.............",
+    "BBBBBB.QTM.Q.............",
+    ".OOOOBB.QTM..............",
+    "...OOOBBD.QMM............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "......OBB.OD.......DBBB..",
+    ".....OB...DD........DOBB.",
+    "....OB....DD........DDOBB",
+    "....O......D........DD.OB",
+    "...O.......D.........D.OO",
+    "...........D...........O."
+  ],
+  walk2: [
+    "...O.O.QM................",
+    "..TTMM.TM................",
+    ".TMMM.KPQM...............",
+    "EBEBM.QMMQM..............",
+    "BBBBBB.QTMQ..............",
+    ".OOOOBB.QTM..............",
+    "...OOOBBDQMM.............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD......DBBB..",
+    ".........BODD......DOBB..",
+    ".........BODD......DDOBB.",
+    ".........B.OD.......DD.OB",
+    ".........O.DD........D.OO",
+    ".........O..D..........O."
+  ],
+  eat: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "...O.O.QM.BBBDBBBBBBBBBOB",
+    "..TTMM.KPQMBOBBBBBBBBBBBO",
+    ".EBEBMTMM.QMD...LBBBBBBO.",
+    "EBEBB.QTM.OBOD.....DBBB..",
+    ".EEB...QM..BODD....DOBB..",
+    ".EE.....Q..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "....O.O.QM...............",
+    "...TTMM.TM...............",
+    "..TMMM.KPQM..............",
+    ".EBEBM.QMMQM...OBOBO.....",
+    "EBEBM.QTMQ.BBBOBBBBDBBBB.",
+    ".EEB.QTM.BBBBBBBBBBBBBBBB",
+    "..E.QMM.OBBBDBBBDBBBBBBBB",
+    "....QM.OBBBOBBBBBBBBBBBBO",
+    "....Q.OBBOD....LBBBBBBO..",
+    ".....OBBOD.......DBBB....",
+    ".....SOODD.......DOBB....",
+    "........................."
+  ],
+  drink: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "...O.O.QM.BBBDBBBBBBBBBOB",
+    "..TTMM.KPQMBOBBBBBBBBBBBO",
+    ".EBEBMTMM.QMD...LBBBBBBO.",
+    "EBEBB.QTM.OBOD.....DBBB..",
+    ".EEB...QM..BODD....DOBB..",
+    ".EE.....Q..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  happy: [
+    "...O.O..TTMM.............",
+    "..TTMM.TMMM.QM...........",
+    ".TMMM.KPQMM.QM...........",
+    "EBEBM.QTMQ.QM............",
+    "BBBBBB.QTM.Q.............",
+    ".OOOOBB.QM...............",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........BOD........DBBB..",
+    "........BOD.........DOB..",
+    ".........O..........DO...",
+    ".........................",
+    ".........................",
+    "........................."
+  ]
+};
+
+// ==========================================================================
 // PUDÚ BEBÉ / CERVATILLO (18x15) - Tierno, compacto y con pintas doradas
 // ==========================================================================
 export const FAWN_FRAMES = {
@@ -407,7 +574,12 @@ export const PUDU_COLOR_MAP = {
   'D': PALETTE.puduDark,
   'L': PALETTE.puduLight,
   'E': PALETTE.puduSnout,
-  'S': PALETTE.puduShadow
+  'S': PALETTE.puduShadow,
+  'M': '#39c5bb', // Hatsune Miku Teal / Cyan
+  'T': '#7ef6ea', // Miku Teal Brillo
+  'Q': '#167a71', // Miku Teal Sombra
+  'K': '#18181b', // Cinta Negra Futurista
+  'P': '#ff2a85'  // Detalle Magenta Neón
 };
 
 // Accesorios en la cabeza ajustados al nuevo tamaño de 25x21 y crías
