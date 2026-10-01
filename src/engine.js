@@ -15,6 +15,7 @@ export class GameEngine {
     this.lastTime = performance.now();
     this.saveTimer = 0;
     this.chucaoSpawnTimer = 35; // Primer Chucao a los 35s
+    this.bayaDoradaTimer = 50; // Primera Baya Dorada a los 50s
     this.climaTimer = 75; // Cambio de clima cada 75s
   }
 
@@ -64,10 +65,34 @@ export class GameEngine {
       }
     }
 
-    // 4. Manejo del vuelo del Chucao
+    // 4. Temporizador de Buff de Cocina (Kuchen y recetas)
+    if (s.buffCocina.segundosRestantes > 0) {
+      s.buffCocina.segundosRestantes -= dt;
+      if (s.buffCocina.segundosRestantes <= 0) {
+        s.buffCocina.multiplicador = 1;
+        this.ui.notify("El aroma del festín de cocina ha concluido.", "info");
+      }
+    }
+
+    // 5. Temporizador de Buff de Agua de la Ranita de Darwin
+    if (s.ranitaDarwin && s.ranitaDarwin.segundosBuffAgua > 0) {
+      s.ranitaDarwin.segundosBuffAgua -= dt;
+      if (s.ranitaDarwin.segundosBuffAgua <= 0) {
+        this.ui.notify("El rocío revitalizante del arroyo vuelve a la calma.", "info");
+      }
+    }
+
+    // 6. Proceso de Cocción en la Olla de Greda
+    const platoListo = this.state.tickCoccion(dt);
+    if (platoListo) {
+      this.sound.playChime();
+      this.ui.notify(`¡Listo en la Olla de Greda! ${platoListo.nombre}: ${platoListo.bono}`, "success");
+    }
+
+    // 7. Manejo del vuelo del Chucao
     if (s.chucao.activo) {
       s.chucao.x += (s.chucao.direccion * 75) * dt;
-      if ((s.chucao.direccion > 0 && s.chucao.x > this.diorama.width + 40) ||
+      if ((s.chucao.direccion > 0 && s.chucao.x > this.diorama.virtualWidth + 40) ||
           (s.chucao.direccion < 0 && s.chucao.x < -40)) {
         s.chucao.activo = false;
       }
@@ -80,16 +105,25 @@ export class GameEngine {
       }
     }
 
-    // 5. Ciclo Dinámico del Clima
+    // 8. Evento periódico de Baya Dorada flotante
+    if (!s.bayaDorada?.activa) {
+      this.bayaDoradaTimer -= dt;
+      if (this.bayaDoradaTimer <= 0) {
+        this.spawnBayaDorada();
+        this.bayaDoradaTimer = 65 + Math.random() * 45;
+      }
+    }
+
+    // 9. Ciclo Dinámico del Clima
     this.climaTimer -= dt;
     if (this.climaTimer <= 0) {
       this.cambiarClima();
     }
 
-    // 6. Verificación de Fases, Desbloqueos Didácticos y Recuerdos
+    // 10. Verificación de Fases, Desbloqueos Didácticos y Recuerdos
     this.checkPhaseProgression();
 
-    // 7. Guardado automático periódico (cada 5s)
+    // 11. Guardado automático periódico (cada 5s)
     this.saveTimer += dt;
     if (this.saveTimer >= 5) {
       this.saveTimer = 0;
@@ -123,10 +157,20 @@ export class GameEngine {
     const s = this.state.data;
     s.chucao.activo = true;
     s.chucao.direccion = Math.random() > 0.5 ? 1 : -1;
-    s.chucao.x = s.chucao.direccion > 0 ? -20 : this.diorama.width + 20;
-    s.chucao.y = 45 + Math.random() * (this.diorama.height * 0.35);
+    s.chucao.x = s.chucao.direccion > 0 ? -20 : this.diorama.virtualWidth + 20;
+    s.chucao.y = 35 + Math.random() * (this.diorama.virtualHeight * 0.35);
     this.sound.playChucao();
     this.ui.notify("¡Un Chucao curioso vuela por el bosque!", "chucao");
+  }
+
+  spawnBayaDorada() {
+    const s = this.state.data;
+    s.bayaDorada.activa = true;
+    s.bayaDorada.x = 45 + Math.random() * (this.diorama.virtualWidth - 90);
+    s.bayaDorada.y = 15;
+    s.bayaDorada.vy = 0.45 + Math.random() * 0.20;
+    this.sound.playChirp(780, 0.08);
+    this.ui.notify("¡Una Baya Dorada flota suavemente entre las copas de los árboles!", "baya");
   }
 
   clickChucao() {
@@ -239,18 +283,20 @@ export class GameEngine {
     }
   }
 
-  // Crafteo de Mermelada en Fase 4
+  // Crafteo de Mermelada en Olla de Greda
   cocinarMermelada() {
     const s = this.state.data;
-    const costoMaquis = 1200;
-    if (s.maquis >= costoMaquis) {
-      s.maquis -= costoMaquis;
-      s.mermeladas += 1;
-      s.totalMermeladas += 1;
+    if (s.cocina.enCoccion) {
+      this.ui.notify("La olla de greda ya está al fuego cocinando otra receta.", "warn");
+      return;
+    }
+    const ok = this.state.iniciarCoccion('mermelada_clasica');
+    if (ok) {
       this.sound.playChime();
-      this.ui.notify("¡Has elaborado un frasco de mermelada de maqui pura! (+3% permanente a toda la producción)", "success");
+      this.ui.notify("¡Iniciando cocción de Mermelada de Maqui en la olla de greda! (15 segundos)", "info");
     } else {
-      this.ui.notify(`Necesitas ${costoMaquis.toLocaleString()} maquis para preparar una mermelada en olla de greda.`, "warn");
+      const costo = s.cocina.recetas.mermelada_clasica.costoMaquis;
+      this.ui.notify(`Necesitas ${costo.toLocaleString()} maquis para preparar una mermelada en olla de greda.`, "warn");
     }
   }
 

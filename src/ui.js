@@ -85,26 +85,56 @@ export class GameUI {
         // Convertir a coordenadas virtuales del diorama
         const vCoords = this.diorama.screenToVirtual(screenX, screenY);
 
-        // A. Verificar click sobre el Chucao
+        // A. Verificar click sobre el Chucao en vuelo
         const ch = this.state.data.chucao;
         if (ch.activo) {
           const distChucao = Math.hypot(vCoords.x - ch.x, vCoords.y - ch.y);
-          if (distChucao < 18) {
+          if (distChucao < 20) {
             this.engine.clickChucao();
             return;
           }
         }
 
-        // B. Verificar click sobre algún Pudú en el suelo para acariciarlo
+        // B. Verificar click sobre la Baya Dorada flotante
+        const bd = this.state.data.bayaDorada;
+        if (bd && bd.activa) {
+          const distBD = Math.hypot(vCoords.x - (bd.x + 4), vCoords.y - (bd.y + 4));
+          if (distBD < 18) {
+            this.diorama.clickBayaDorada();
+            return;
+          }
+        }
+
+        // C. Verificar click sobre la Ranita de Darwin en el arroyo
+        const frog = this.state.data.ranitaDarwin;
+        if (frog && frog.activa) {
+          const distFrog = Math.hypot(vCoords.x - (frog.x + 4), vCoords.y - (frog.y + 4));
+          if (distFrog < 16) {
+            this.diorama.clickRanita();
+            return;
+          }
+        }
+
+        // D. Verificar click sobre algún Pudú o Cervatillo para acariciarlo
         for (const pudu of this.diorama.pudusVisuales) {
           const distPudu = Math.hypot(vCoords.x - (pudu.x + 8), vCoords.y - (pudu.y + 6));
-          if (distPudu < 14) {
+          if (distPudu < 15) {
             this.diorama.petPudu(pudu);
             return;
           }
         }
 
-        // C. Clic en el arbusto central o bayas
+        // E. Clic en la Olla de Greda (si está en fase >= 3)
+        const potX = this.diorama.virtualWidth - 45;
+        const potY = this.diorama.virtualHeight - 38;
+        const distPot = Math.hypot(vCoords.x - potX, vCoords.y - potY);
+        if (distPot < 20 && this.state.data.fase >= 3) {
+          this.switchTab('taller');
+          this.sound.playChirp(520, 0.06);
+          return;
+        }
+
+        // F. Clic en el arbusto central o bayas
         const ganancia = this.state.getMaquisPorClick();
         this.state.data.maquis += ganancia;
         this.state.data.totalMaquis += ganancia;
@@ -235,6 +265,28 @@ export class GameUI {
         petIndicator.innerText = `💖 ¡Manada Feliz! +25% (${Math.ceil(s.caricias.segundosBonoCaricia)}s)`;
       } else {
         petIndicator.classList.add('hidden');
+      }
+    }
+
+    // 4.1 Indicador de Buff de Cocina en HUD
+    const cookIndicator = document.getElementById('cook-indicator');
+    if (cookIndicator) {
+      if (s.buffCocina.segundosRestantes > 0) {
+        cookIndicator.classList.remove('hidden');
+        cookIndicator.innerText = `🥧 Kuchen Austral: x${s.buffCocina.multiplicador} (${Math.ceil(s.buffCocina.segundosRestantes)}s)`;
+      } else {
+        cookIndicator.classList.add('hidden');
+      }
+    }
+
+    // 4.2 Indicador de Rocío de la Ranita de Darwin en HUD
+    const waterIndicator = document.getElementById('water-indicator');
+    if (waterIndicator) {
+      if (s.ranitaDarwin && s.ranitaDarwin.segundosBuffAgua > 0) {
+        waterIndicator.classList.remove('hidden');
+        waterIndicator.innerText = `💧 Rocío del Arroyo: +30% (${Math.ceil(s.ranitaDarwin.segundosBuffAgua)}s)`;
+      } else {
+        waterIndicator.classList.add('hidden');
       }
     }
 
@@ -390,38 +442,124 @@ export class GameUI {
     if (!container) return;
 
     const s = this.state.data;
-    if (s.fase < 4) {
+    if (s.fase < 3) {
       container.innerHTML = `
         <div class="empty-state">
           <span class="empty-icon">🏺</span>
           <h4>El Taller Austral aún no ha sido descubierto</h4>
-          <p>Sigue cuidando a la manada y cosechando maquis para desbloquear la cocinilla comunitaria.</p>
+          <p>Sigue cuidando a la manada y cosechando maquis para descubrir la vieja olla de greda junto al arroyo.</p>
         </div>
       `;
       return;
     }
 
-    container.innerHTML = `
-      <div class="workshop-panel">
-        <div class="jam-crafting">
-          <div class="jam-display">
-            <span class="jam-icon">🍯</span>
-            <div class="jam-info">
-              <h3>Mermelada de Maqui en Olla de Greda</h3>
-              <p>Frascos elaborados: <strong>${s.mermeladas}</strong></p>
-              <small>Efecto: +${(s.mermeladas * 3)}% permanente a toda la producción del bosque.</small>
-            </div>
-          </div>
-          <button id="btn-cook-jam" class="cta-btn ${s.maquis >= 1200 ? '' : 'disabled'}">
-            Cocinar Frasco (1,200 🌰)
-          </button>
-        </div>
+    container.innerHTML = '';
+    const panel = document.createElement('div');
+    panel.className = 'workshop-panel';
+
+    // 1. Cabecera de la Olla de Greda
+    const header = document.createElement('div');
+    header.className = 'claypot-header';
+    header.innerHTML = `
+      <span class="claypot-icon">🏺</span>
+      <div class="claypot-title-group">
+        <h3>La Olla de Greda Austral</h3>
+        <p>Cocción lenta y tradicional a la leña</p>
+        <span class="claypot-stats">🍯 Frascos elaborados: <strong>${s.mermeladas}</strong> (+${(s.mermeladas * 4)}% Armonía permanente)</span>
       </div>
     `;
+    panel.appendChild(header);
 
-    document.getElementById('btn-cook-jam').onclick = () => {
-      this.engine.cocinarMermelada();
-    };
+    // 2. Estado de cocción activo si está cocinando
+    const c = s.cocina;
+    if (c.enCoccion) {
+      const rec = c.recetas[c.recetaActual] || { nombre: 'Receta Austral' };
+      const pct = Math.max(0, Math.min(100, ((c.tiempoTotal - c.tiempoRestante) / c.tiempoTotal) * 100));
+      const activeCard = document.createElement('div');
+      activeCard.className = 'cooking-active-card';
+      activeCard.innerHTML = `
+        <div class="cooking-header">
+          <span class="cooking-title">🔥 Cocinando: ${rec.nombre}</span>
+          <span class="cooking-time">⏱️ ${Math.ceil(c.tiempoRestante)}s</span>
+        </div>
+        <div class="cooking-progress-bar">
+          <div class="cooking-progress-fill" style="width: ${pct}%;"></div>
+        </div>
+      `;
+      panel.appendChild(activeCard);
+    }
+
+    // 3. Banner de Buff activo de cocina si está activo
+    if (s.buffCocina.segundosRestantes > 0) {
+      const buffBanner = document.createElement('div');
+      buffBanner.className = 'active-buff-banner';
+      buffBanner.innerHTML = `
+        <span>🥧</span>
+        <div>
+          <strong>¡Festín de Kuchen Activo!</strong>
+          <p>x${s.buffCocina.multiplicador} a toda la producción del bosque (${Math.ceil(s.buffCocina.segundosRestantes)}s restantes)</p>
+        </div>
+      `;
+      panel.appendChild(buffBanner);
+    }
+
+    // 4. Lista de Recetas Disponibles
+    const recipesList = document.createElement('div');
+    recipesList.className = 'recipes-list';
+
+    for (const key in c.recetas) {
+      const rec = c.recetas[key];
+      const puedeCocinar = rec.desbloqueada && !c.enCoccion && s.maquis >= rec.costoMaquis;
+
+      const card = document.createElement('div');
+      card.className = `recipe-card ${puedeCocinar ? 'affordable' : ''} ${!rec.desbloqueada ? 'locked' : ''}`;
+
+      if (rec.desbloqueada) {
+        card.innerHTML = `
+          <div class="recipe-icon">${rec.icono}</div>
+          <div class="recipe-info">
+            <div class="recipe-title-row">
+              <span class="recipe-name">${rec.nombre}</span>
+              <span class="recipe-duration">⏱️ ${rec.tiempoSegundos}s</span>
+            </div>
+            <p class="recipe-desc">${rec.desc}</p>
+          </div>
+          <div class="recipe-actions">
+            <button class="recipe-btn" ${!puedeCocinar ? 'disabled' : ''}>
+              ${c.enCoccion ? 'Olla Ocupada' : `Cocinar (${rec.costoMaquis.toLocaleString()} 🌰)`}
+            </button>
+          </div>
+        `;
+
+        const cookBtn = card.querySelector('.recipe-btn');
+        if (cookBtn && puedeCocinar) {
+          cookBtn.onclick = () => {
+            const ok = this.state.iniciarCoccion(rec.id);
+            if (ok) {
+              this.sound.playChime();
+              this.notify(`¡Iniciando cocción de ${rec.nombre}!`, 'info');
+            }
+          };
+        }
+      } else {
+        const requisito = key === 'kuchen_maqui' ? 'Elabora 2 frascos de mermelada' : 'Elabora 4 frascos de mermelada';
+        card.innerHTML = `
+          <div class="recipe-icon">🔒</div>
+          <div class="recipe-info">
+            <span class="recipe-name">${rec.nombre}</span>
+            <p class="recipe-desc recipe-locked-text">🔒 Requiere: ${requisito}</p>
+          </div>
+          <div class="recipe-actions">
+            <button class="recipe-btn" disabled>Bloqueado</button>
+          </div>
+        `;
+      }
+
+      recipesList.appendChild(card);
+    }
+
+    panel.appendChild(recipesList);
+    container.appendChild(panel);
   }
 
   renderBitacora() {

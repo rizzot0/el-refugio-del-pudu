@@ -223,6 +223,181 @@ export const PUDU_FRAMES = {
     "...DOOOBBBOBDDBBBBBBBD...",
     "....OOOOODDDDDLBBBBBBD...",
     ".....OOOO......DDDDD....."
+  ],
+
+  // Bebiendo agua fresca en la orilla del arroyo
+  drink: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........DDDDDBOBOBO.....",
+    ".......DDBBBOBOBBBBDBBBB.",
+    "......DDBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "...OOBBBBBBBBDBBBBBBBBBOB",
+    "..EBBBBBOBBBOBBBBBBBBBBBO",
+    ".EBEBBOOBBOD....LBBBBBBO.",
+    "EBEBB..OBBOD.......DBBB..",
+    ".EEB....BODD.......DOBB..",
+    ".EE.....BODD.......DDOBB.",
+    "..E.....BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
+  ],
+
+  // Saltando de alegría / Acariciado (Hop de felicidad)
+  happy: [
+    "...O.O...................",
+    "..OBOB...................",
+    ".BBBBB...................",
+    "EBEBBB...................",
+    "BBBBBBB..................",
+    ".OOOOBBB.................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........BOD........DBBB..",
+    "........BOD.........DOB..",
+    ".........O..........DO...",
+    ".........................",
+    ".........................",
+    "........................."
+  ]
+};
+
+// ==========================================================================
+// PUDÚ BEBÉ / CERVATILLO (18x15) - Tierno, compacto y con pintas doradas
+// ==========================================================================
+export const FAWN_FRAMES = {
+  idle: [
+    "..O.O.............",
+    ".BBBB.............",
+    "EBEBB.............",
+    "BBBBB.............",
+    ".OOBBB............",
+    "..OOBBBDDOBOBO....",
+    "..OOBBBBOBBBBDBB..",
+    "...OBBBBBBBBBBBBB.",
+    "...OBBDBBDBBBBBBBB",
+    "...OBBOBBBBBBBBBBO",
+    "....BBOD...LBBBBBO",
+    "....BOD......DBB..",
+    "....BOD......DOB..",
+    "....OBD......D.OB.",
+    "....SO.......D..O."
+  ],
+  walk1: [
+    "..O.O.............",
+    ".BBBB.............",
+    "EBEBB.............",
+    "BBBBB.............",
+    ".OOBBB............",
+    "..OOBBBDDOBOBO....",
+    "..OOBBBBOBBBBDBB..",
+    "...OBBBBBBBBBBBBB.",
+    "...OBBDBBDBBBBBBBB",
+    "...OBBOBBBBBBBBBBO",
+    "....BBOD...LBBBBBO",
+    "...OB.OD.....DBB..",
+    "..OB..OD......DOB.",
+    '..O....D......D.OB',
+    ".......D.......D.O"
+  ],
+  walk2: [
+    "..O.O.............",
+    ".BBBB.............",
+    "EBEBB.............",
+    "BBBBB.............",
+    ".OOBBB............",
+    "..OOBBBDDOBOBO....",
+    "..OOBBBBOBBBBDBB..",
+    "...OBBBBBBBBBBBBB.",
+    "...OBBDBBDBBBBBBBB",
+    "...OBBOBBBBBBBBBBO",
+    "....BBOD...LBBBBBO",
+    ".....BOD.....DBB..",
+    ".....BOD.....DOB..",
+    ".....OBD.....D.OB.",
+    ".....SO......D..O."
+  ],
+  eat: [
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    ".......DDDOBOBO...",
+    "......DDBBOBBBBDBB",
+    ".....ODBBBBBBBBBBB",
+    "....O.OBBDBBBBBBBB",
+    "...OOBBBBBBBBBBBBO",
+    "..EBBBBBOBBBBBBBBO",
+    ".EBEBBOOBD..LBBBBB",
+    "EBEBB..BOD.....DBB",
+    ".EEB...BOD.....DOB",
+    ".......OBD.....D.O",
+    ".......SO......D.O"
+  ],
+  sleep: [
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    "......DDDDDD......",
+    "...DDDBBOBOBBDD...",
+    "..DBBBBBBOBOBBBD..",
+    ".DBBOEBEBBBBBBBD..",
+    ".DBBBBBBOBDDBBBD..",
+    "..DOOOODDDDLBBBD..",
+    "...OOOO....DDDD..."
+  ],
+  drink: [
+    "..................",
+    "..................",
+    "..................",
+    "..................",
+    ".......DDDOBOBO...",
+    "......DDBBOBBBBDBB",
+    ".....ODBBBBBBBBBBB",
+    "....O.OBBDBBBBBBBB",
+    "...OOBBBBBBBBBBBBO",
+    "..EBBBBBOBBBBBBBBO",
+    ".EBEBBOOBD..LBBBBB",
+    "EBEBB..BOD.....DBB",
+    ".EEB...BOD.....DOB",
+    "..E....OBD.....D.O",
+    ".......SO......D.O"
+  ],
+  happy: [
+    "..O.O.............",
+    ".OBOB.............",
+    "EBEBB.............",
+    "BBBBB.............",
+    ".OOBBB............",
+    "..OOBBBDDOBOBO....",
+    "..OOBBBBOBBBBDBB..",
+    "...OBBBBBBBBBBBBB.",
+    "...OBBDBBDBBBBBBBB",
+    "...OBBOBBBBBBBBBBO",
+    "....BBOD...LBBBBBO",
+    ".....BOD.....DBB..",
+    "......O.......D...",
+    "..................",
+    ".................."
   ]
 };
 
@@ -235,7 +410,7 @@ export const PUDU_COLOR_MAP = {
   'S': PALETTE.puduShadow
 };
 
-// Accesorios en la cabeza ajustados al nuevo tamaño de 25x21
+// Accesorios en la cabeza ajustados al nuevo tamaño de 25x21 y crías
 export const ACCESSORY_SPRITES = {
   leaf: [
     "....G...",
@@ -257,7 +432,54 @@ export const ACCESSORY_SPRITES = {
   scarf: [
     "RRRRRRRR",
     "RRR..RRR"
+  ],
+  crown: [
+    "..RR..YY..RR..",
+    ".RRRR.YYYY.RRRR.",
+    "GGGGGGGGGGGGGGGG"
+  ],
+  dewdrop: [
+    "..WW..",
+    ".WWWW.",
+    ".WWWW.",
+    "..WW.."
   ]
+};
+
+// Ranita de Darwin (Rhinoderma darwinii) - 8x7 pixel
+export const DARWIN_FROG_SPRITE = [
+  "...GG...",
+  "..GGGG..",
+  ".GEGGEG.",
+  "GGYYYYGG",
+  ".GGGGGG.",
+  "..G..G..",
+  ".GG..GG."
+];
+
+export const DARWIN_FROG_COLOR_MAP = {
+  'G': PALETTE.leafLight,
+  'Y': '#ca8a04',
+  'E': '#111111'
+};
+
+// Baya Dorada Flotante con Paracaídas de Hoja - 8x8 pixel
+export const GOLDEN_BERRY_SPRITE = [
+  "...GG...",
+  "..GGGG..",
+  "...TT...",
+  "..YYYY..",
+  ".YYYYYY.",
+  ".YYWWYY.",
+  ".YYYYYY.",
+  "..YYYY.."
+];
+
+export const GOLDEN_BERRY_COLOR_MAP = {
+  'G': PALETTE.leafHighlight,
+  'T': PALETTE.trunkMid,
+  'Y': '#facc15',
+  'W': '#ffffff'
 };
 
 // Chucao

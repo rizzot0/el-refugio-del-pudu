@@ -40,6 +40,68 @@ export const INITIAL_STATE = {
     segundosRestantesSuerte: 0
   },
 
+  // Evento activo de Baya Dorada Flotante (Golden Berry Event)
+  bayaDorada: {
+    activa: false,
+    x: 0,
+    y: 0,
+    vy: 0.55,
+    recolectada: false
+  },
+
+  // Ranita de Darwin en el Arroyo
+  ranitaDarwin: {
+    activa: true,
+    x: 36,
+    y: 196,
+    saltos: 0,
+    croakTimer: 0,
+    segundosBuffAgua: 0
+  },
+
+  // Sistema de Cocina Tradicional en la Olla de Greda
+  cocina: {
+    enCoccion: false,
+    tiempoRestante: 0,
+    tiempoTotal: 20,
+    recetaActual: null,
+    recetas: {
+      mermelada_clasica: {
+        id: "mermelada_clasica",
+        nombre: "Mermelada de Maqui Austral",
+        costoMaquis: 500,
+        tiempoSegundos: 15,
+        icono: "🍯",
+        desc: "Cocción lenta con leña seca en olla de greda. Otorga +1 frasco y +4% permanente a la Armonía.",
+        desbloqueada: true
+      },
+      kuchen_maqui: {
+        id: "kuchen_maqui",
+        nombre: "Kuchen Sureño de Maqui",
+        costoMaquis: 2200,
+        tiempoSegundos: 25,
+        icono: "🥧",
+        desc: "Masa crujiente y bayas seleccionadas. Otorga x2 producción general por 90 segundos.",
+        desbloqueada: false
+      },
+      infusion_canelo: {
+        id: "infusion_canelo",
+        nombre: "Infusión de Canelo y Miel",
+        costoMaquis: 1200,
+        tiempoSegundos: 20,
+        icono: "🍵",
+        desc: "Té revitalizante. Triplica el poder de las caricias y hace saltar de alegría a los pudús.",
+        desbloqueada: false
+      }
+    }
+  },
+
+  // Buffs temporales de cocina
+  buffCocina: {
+    multiplicador: 1,
+    segundosRestantes: 0
+  },
+
   // Sistema de Caricias a Pudús (Petting)
   caricias: {
     contadorTotal: 0,
@@ -202,19 +264,19 @@ export const INITIAL_STATE = {
 
   // Pudús residentes en el refugio
   pudus: [
-    { id: "pudu_1", nombre: "Pichi", rol: "El primer explorador", humor: "Feliz y curioso", sombrero: "🍂" }
+    { id: "pudu_1", nombre: "Pichi", tipo: "adult", rol: "El primer explorador", humor: "Curioso y regalón", sombrero: "leaf" }
   ],
 
-  // Lista de nombres disponibles para los pudús que se van uniendo
+  // Lista de nombres disponibles para los pudús y cervatillos que se van uniendo
   nombresDisponibles: [
-    { nombre: "Pewén", rol: "Recolector de hojas tiernas", sombrero: "🍁" },
-    { nombre: "Rayén", rol: "Cuidaperlas del bosque", sombrero: "🌸" },
-    { nombre: "Antu", rol: "Vigía de los rayos de sol", sombrero: "☀️" },
-    { nombre: "Millaray", rol: "Degustadora de mermeladas", sombrero: "🎀" },
-    { nombre: "Kutral", rol: "Guardián de la leña seca", sombrero: "🔥" },
-    { nombre: "Lafkén", rol: "Explorador de orillas de arroyo", sombrero: "🌊" },
-    { nombre: "Nahuel", rol: "Dormilón bajo los helechos", sombrero: "💤" },
-    { nombre: "Ailín", rol: "Recolectora de rocío de la mañana", sombrero: "💧" }
+    { nombre: "Pewencito", tipo: "fawn", rol: "Cervatillo juguetón", sombrero: "dewdrop" },
+    { nombre: "Rayén", tipo: "adult", rol: "Cuidaperlas del bosque", sombrero: "copihue" },
+    { nombre: "Antu", tipo: "adult", rol: "Vigía de los rayos de sol", sombrero: "chupalla" },
+    { nombre: "Millaray", tipo: "adult", rol: "Cocinera de mermeladas", sombrero: "crown" },
+    { nombre: "Kutral", tipo: "adult", rol: "Guardián de la leña seca", sombrero: "scarf" },
+    { nombre: "Lafkén", tipo: "adult", rol: "Bebedor de arroyo cristalino", sombrero: "leaf" },
+    { nombre: "Nahuel", tipo: "adult", rol: "Dormilón bajo los helechos", sombrero: "dewdrop" },
+    { nombre: "Ailín", tipo: "fawn", rol: "Cervatillo cazamariposas", sombrero: "copihue" }
   ],
 
   // Fichas didácticas descubiertas en la Bitácora
@@ -244,11 +306,11 @@ export class GameState {
       totalBase += prod.cantidad * prod.produccionBase;
     }
 
-    // Sinergia: Camitas de musgo potencian a la manada (+2% por camita)
-    const bonoCamitas = 1 + (this.data.productores.camitaMusgo.cantidad * 0.02);
+    // Sinergia: Camitas de musgo potencian a la manada (+2.5% por camita)
+    const bonoCamitas = 1 + (this.data.productores.camitaMusgo.cantidad * 0.025);
 
-    // Efecto de mermeladas elaboradas (+3% permanente por cada frasco)
-    const bonoMermelada = 1 + (this.data.mermeladas * 0.03);
+    // Efecto de mermeladas elaboradas (+4% permanente por cada frasco)
+    const bonoMermelada = 1 + (this.data.mermeladas * 0.04);
 
     // Multiplicador del clima actual
     const bonoClima = this.data.clima.multiplicador;
@@ -256,13 +318,19 @@ export class GameState {
     // Multiplicador de suerte temporal del Chucao
     const bonoChucao = this.data.chucao.multiplicadorSuerte;
 
-    // Multiplicador por caricia a los pudús (+25% temporal)
+    // Multiplicador por caricia a los pudús (+35% temporal)
     const bonoCaricia = this.data.caricias.multiplicadorCaricia;
+
+    // Buff temporal de cocina (Kuchen u otros)
+    const bonoBuffCocina = this.data.buffCocina.multiplicador;
+
+    // Buff de agua de la Ranita de Darwin (+30% a acequias y producción)
+    const bonoRanita = this.data.ranitaDarwin.segundosBuffAgua > 0 ? 1.3 : 1.0;
 
     // Multiplicador de ritmo
     const bonoRitmo = this.data.ritmo === 'veloz' ? 1.5 : 1.0;
 
-    return totalBase * this.data.armonia * bonoCamitas * bonoMermelada * bonoClima * bonoChucao * bonoCaricia * bonoRitmo;
+    return totalBase * this.data.armonia * bonoCamitas * bonoMermelada * bonoClima * bonoChucao * bonoCaricia * bonoBuffCocina * bonoRanita * bonoRitmo;
   }
 
   // Producción manual por click
@@ -276,8 +344,60 @@ export class GameState {
 
     const bonoChucao = this.data.chucao.multiplicadorSuerte;
     const bonoClima = this.data.clima.tipo === 'arcoiris_sol' ? 2 : 1;
+    const bonoCaricia = this.data.caricias.multiplicadorCaricia > 1 ? 1.25 : 1.0;
     const bonoRitmo = this.data.ritmo === 'veloz' ? 1.5 : 1.0;
 
-    return Math.max(1, Math.round(porClick * bonoChucao * bonoClima * bonoRitmo));
+    return Math.max(1, Math.round(porClick * bonoChucao * bonoClima * bonoCaricia * bonoRitmo));
+  }
+
+  // Iniciar cocción de receta en la olla de greda
+  iniciarCoccion(recetaId) {
+    const c = this.data.cocina;
+    const rec = c.recetas[recetaId];
+    if (!rec || c.enCoccion) return false;
+
+    if (this.data.maquis >= rec.costoMaquis) {
+      this.data.maquis -= rec.costoMaquis;
+      c.enCoccion = true;
+      c.recetaActual = recetaId;
+      c.tiempoTotal = rec.tiempoSegundos;
+      c.tiempoRestante = rec.tiempoSegundos;
+      return true;
+    }
+    return false;
+  }
+
+  // Actualizar cocción con delta time
+  tickCoccion(dt) {
+    const c = this.data.cocina;
+    if (!c.enCoccion) return null;
+
+    c.tiempoRestante -= dt;
+    if (c.tiempoRestante <= 0) {
+      c.enCoccion = false;
+      const recId = c.recetaActual;
+      c.recetaActual = null;
+      c.tiempoRestante = 0;
+
+      // Aplicar recompensas de la receta
+      if (recId === 'mermelada_clasica') {
+        this.data.mermeladas += 1;
+        this.data.totalMermeladas += 1;
+        this.data.armonia += 0.04; // +4% permanente
+        // Desbloquear nuevas recetas al acumular mermeladas
+        if (this.data.mermeladas >= 2) c.recetas.kuchen_maqui.desbloqueada = true;
+        if (this.data.mermeladas >= 4) c.recetas.infusion_canelo.desbloqueada = true;
+        return { tipo: 'mermelada', nombre: 'Mermelada de Maqui', bono: '+1 Frasco (+4% Armonía permanente)' };
+      } else if (recId === 'kuchen_maqui') {
+        this.data.buffCocina.multiplicador = 2.0;
+        this.data.buffCocina.segundosRestantes = 90;
+        return { tipo: 'buff', nombre: 'Kuchen de Maqui', bono: 'x2 Producción total por 90s' };
+      } else if (recId === 'infusion_canelo') {
+        this.data.caricias.segundosBonoCaricia = 45;
+        this.data.caricias.multiplicadorCaricia = 2.0;
+        return { tipo: 'canelo', nombre: 'Infusión de Canelo', bono: 'x2 Buff de Caricias y alegría pura por 45s' };
+      }
+    }
+    return null;
   }
 }
