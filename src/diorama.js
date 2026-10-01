@@ -154,7 +154,7 @@ export class ForestDiorama {
   }
 
   // Clic en el arbusto central
-  triggerBushClick(screenEvent) {
+  triggerBushClick(screenEvent, gananciaEspecial = null, esCritico = false) {
     this.bushScale = 0.85;
     this.sound.playBerryPop();
 
@@ -179,20 +179,27 @@ export class ForestDiorama {
       });
     }
 
-    // Partículas de jugo de maqui
-    for (let i = 0; i < 4; i++) {
+    // Partículas de jugo de maqui y destellos
+    const partColor = esCritico ? '#facc15' : PALETTE.berryLight;
+    const numPart = esCritico ? 8 : 4;
+    for (let i = 0; i < numPart; i++) {
       this.pixelParticles.push({
         x: vx + (Math.random() - 0.5) * 16,
         y: vy + (Math.random() - 0.5) * 16,
-        vx: (Math.random() - 0.5) * 2,
-        vy: -1.5 - Math.random() * 2,
-        color: PALETTE.berryLight,
-        life: 0.8
+        vx: (Math.random() - 0.5) * (esCritico ? 3.5 : 2),
+        vy: -1.5 - Math.random() * (esCritico ? 3 : 2),
+        color: partColor,
+        life: esCritico ? 1.1 : 0.8
       });
     }
 
-    const ganancia = this.state.getMaquisPorClick();
-    this.addFloatingText(`+${ganancia}`, vx, vy - 10, '#fef08a');
+    const ganancia = gananciaEspecial !== null ? gananciaEspecial : this.state.getMaquisPorClick();
+    if (esCritico) {
+      this.sound.playChime();
+      this.addFloatingText(`¡CRÍTICO! +${ganancia}`, vx, vy - 14, '#fde047', 12);
+    } else {
+      this.addFloatingText(`+${ganancia}`, vx, vy - 10, '#fef08a');
+    }
   }
 
   // Acariciar pudú
@@ -204,8 +211,16 @@ export class ForestDiorama {
 
     const s = this.state.data;
     s.caricias.contadorTotal++;
-    s.caricias.segundosBonoCaricia = 25;
-    s.caricias.multiplicadorCaricia = s.mejoras.teCanelo?.comprada ? 1.5 : 1.35;
+    const tieneTeCanelo = s.arbolHabilidades?.teCanelo?.comprada || s.mejoras?.teCanelo?.comprada;
+    s.caricias.segundosBonoCaricia = tieneTeCanelo ? 50 : 25;
+    s.caricias.multiplicadorCaricia = tieneTeCanelo ? 1.6 : 1.35;
+
+    // Bono directo de maquis si tiene la infusión del canelo
+    if (tieneTeCanelo) {
+      s.maquis += 25;
+      s.totalMaquis += 25;
+      this.addFloatingText("+25 🌰", pudu.x + 8, pudu.y - 22, '#fef08a', 9);
+    }
 
     // Corazones pixel flotantes
     for (let i = 0; i < 3; i++) {

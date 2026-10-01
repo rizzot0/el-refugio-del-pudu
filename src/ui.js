@@ -5,6 +5,48 @@ import { giftConfig } from './giftConfig.js';
 import { SaveManager } from './save.js';
 import { FAUNA_FLORA_DATA } from './faunaData.js';
 
+export const RAMAS_ARBOL = [
+  {
+    id: "recolector",
+    nombre: "Senda Recolectora",
+    icono: "🍃",
+    color: "#10b981",
+    tagline: "Clicks, Golpes Críticos y Microeventos",
+    t1: "cucharaAlerce",
+    t2a: "cosechaCertera",
+    t2b: "oidoChucao",
+    t3: "teCanelo",
+    t4: "lluviaPrimavera",
+    nodos: ["cucharaAlerce", "cosechaCertera", "oidoChucao", "teCanelo", "lluviaPrimavera"]
+  },
+  {
+    id: "manada",
+    nombre: "Senda de la Manada",
+    icono: "🐾",
+    color: "#f59e0b",
+    tagline: "Pudús, Crías y Automatización Pasiva",
+    t1: "nidoHojarasca",
+    t2a: "zapatosMusgo",
+    t2b: "bufandasChilotas",
+    t3: "armoniaVocal",
+    t4: "llamadoAncestral",
+    nodos: ["nidoHojarasca", "zapatosMusgo", "bufandasChilotas", "armoniaVocal", "llamadoAncestral"]
+  },
+  {
+    id: "taller",
+    nombre: "Senda del Taller",
+    icono: "🍯",
+    color: "#ea580c",
+    tagline: "Olla de Greda, Clima y Multiplicadores",
+    t1: "lenaLuma",
+    t2a: "recetaMermelada",
+    t2b: "amuletoArcoiris",
+    t3: "coronaCopihues",
+    t4: "fuegoSagrado",
+    nodos: ["lenaLuma", "recetaMermelada", "amuletoArcoiris", "coronaCopihues", "fuegoSagrado"]
+  }
+];
+
 export class GameUI {
   constructor(state, sound, diorama) {
     this.state = state;
@@ -12,8 +54,12 @@ export class GameUI {
     this.diorama = diorama;
     this.engine = null;
 
-    this.activeTab = 'cosecha'; // 'cosecha' | 'refugio' | 'taller' | 'bitacora'
+    this.activeTab = 'cosecha'; // 'cosecha' | 'refugio' | 'arbol' | 'taller' | 'bitacora'
     this.sidebarCollapsed = false;
+    this.selectedSkillId = 'cucharaAlerce';
+    this.treeBranchFilter = 'todas';
+    this.isTreeModalOpen = false;
+
     this.setupListeners();
   }
 
@@ -135,11 +181,12 @@ export class GameUI {
         }
 
         // F. Clic en el arbusto central o bayas
-        const ganancia = this.state.getMaquisPorClick();
+        const critMult = this.state.evaluarCritico();
+        const ganancia = this.state.getMaquisPorClick() * critMult;
         this.state.data.maquis += ganancia;
         this.state.data.totalMaquis += ganancia;
         this.state.data.clicksCount++;
-        this.diorama.triggerBushClick(e);
+        this.diorama.triggerBushClick(e, ganancia, critMult > 1);
       });
     }
 
@@ -159,6 +206,20 @@ export class GameUI {
     if (closeLetterBtn) {
       closeLetterBtn.addEventListener('click', () => {
         document.getElementById('modal-regalo').classList.add('hidden');
+      });
+    }
+
+    // 7.1 Cerrar Modal de Árbol de Habilidades
+    const closeTreeBtn = document.getElementById('btn-cerrar-arbol');
+    if (closeTreeBtn) {
+      closeTreeBtn.addEventListener('click', () => {
+        this.cerrarModalArbol();
+      });
+    }
+    const modalArbol = document.getElementById('modal-arbol');
+    if (modalArbol) {
+      modalArbol.addEventListener('click', (e) => {
+        if (e.target === modalArbol) this.cerrarModalArbol();
       });
     }
 
@@ -313,8 +374,13 @@ export class GameUI {
     // 6. Renderizar Pestaña Activa
     if (this.activeTab === 'cosecha') this.renderCosecha();
     if (this.activeTab === 'refugio') this.renderRefugio();
+    if (this.activeTab === 'arbol') this.renderArbolHabilidades();
     if (this.activeTab === 'taller') this.renderTaller();
     if (this.activeTab === 'bitacora') this.renderBitacora();
+
+    if (this.isTreeModalOpen) {
+      this.actualizarModalDetalle();
+    }
   }
 
   renderCosecha() {
@@ -420,46 +486,502 @@ export class GameUI {
     });
     container.appendChild(pudusGrid);
 
-    // Mejoras de Comunidad
+    // Acceso al Árbol de Habilidades
+    const totalAprendidas = Object.values(s.arbolHabilidades || {}).filter(n => n.comprada).length;
     const subheader = document.createElement('div');
     subheader.className = 'section-header';
-    subheader.innerHTML = `<h4>Comodidades del Bosque</h4>`;
+    subheader.innerHTML = `<h4>Comodidades y Armonía del Refugio</h4>`;
     container.appendChild(subheader);
 
-    const upgradesContainer = document.createElement('div');
-    upgradesContainer.className = 'upgrades-grid';
+    const promoCard = document.createElement('div');
+    promoCard.className = 'tree-promo-card';
+    promoCard.innerHTML = `
+      <div class="tree-promo-icon">🌳</div>
+      <div class="tree-promo-info">
+        <strong>Árbol de Habilidades: Raíces de la Armonía</strong>
+        <p>Las comodidades y maestrías del bosque ahora florecen en el Árbol de Habilidades.</p>
+        <div class="tree-promo-stats">✨ ${totalAprendidas} / 15 Habilidades Aprendidas</div>
+      </div>
+      <button class="cta-btn secondary btn-tree-goto">Ver Árbol 🌿</button>
+    `;
+    promoCard.querySelector('.btn-tree-goto').onclick = () => {
+      this.switchTab('arbol');
+    };
+    container.appendChild(promoCard);
+  }
 
-    for (const key in s.mejoras) {
-      const mejora = s.mejoras[key];
-      if (!mejora.desbloqueada || mejora.comprada) continue;
+  // =========================================================================
+  // SISTEMA DEL ÁRBOL DE HABILIDADES ("RAÍCES DE LA ARMONÍA")
+  // =========================================================================
 
-      const puedeComprar = s.maquis >= mejora.costo;
-      const card = document.createElement('div');
-      card.className = `upgrade-card ${puedeComprar ? 'affordable' : 'locked'}`;
-      card.innerHTML = `
-        <div class="card-icon">${mejora.icono}</div>
-        <div class="card-info">
-          <div class="card-title">${mejora.nombre}</div>
-          <div class="card-desc">${mejora.desc}</div>
+  renderArbolHabilidades(force = false) {
+    const container = document.getElementById('tab-arbol-content');
+    if (!container) return;
+
+    const s = this.state.data;
+    const arbol = s.arbolHabilidades;
+    if (!arbol) return;
+
+    // Throttle de refresco visual para evitar reconstruir el DOM en cada frame
+    const now = performance.now();
+    if (!force && this._lastArbolRenderTime && (now - this._lastArbolRenderTime < 300)) {
+      this.actualizarBotonesSidebarArbol();
+      return;
+    }
+    this._lastArbolRenderTime = now;
+
+    const totalHabilidades = Object.keys(arbol).length;
+    const aprendidas = Object.values(arbol).filter(n => n.comprada).length;
+    const pctProgreso = Math.round((aprendidas / totalHabilidades) * 100);
+
+    container.innerHTML = '';
+
+    // 1. Encabezado del Árbol con Progreso y Botón de Expandir
+    const header = document.createElement('div');
+    header.className = 'tree-sidebar-header';
+    header.innerHTML = `
+      <div class="tree-header-top">
+        <div>
+          <h3>🌳 Raíces de la Armonía</h3>
+          <p class="tree-subtitle">Árbol de Habilidades y Maestrías</p>
         </div>
-        <button class="buy-btn" ${!puedeComprar ? 'disabled' : ''}>
-          🌰 ${mejora.costo.toLocaleString()}
+        <button id="btn-open-tree-modal" class="tree-expand-btn" title="Ver en pantalla completa">
+          🔍 Panorámico
         </button>
+      </div>
+
+      <div class="tree-progress-box">
+        <div class="tree-progress-info">
+          <span>✨ Progreso del Claro:</span>
+          <strong>${aprendidas} / ${totalHabilidades} (${pctProgreso}%)</strong>
+        </div>
+        <div class="tree-progress-bar">
+          <div class="tree-progress-fill" style="width: ${pctProgreso}%;"></div>
+        </div>
+      </div>
+
+      <div class="tree-branch-filters">
+        <button class="branch-filter-btn ${this.treeBranchFilter === 'todas' ? 'active' : ''}" data-branch="todas">
+          🌐 Todas
+        </button>
+        <button class="branch-filter-btn filter-recolector ${this.treeBranchFilter === 'recolector' ? 'active' : ''}" data-branch="recolector">
+          🍃 Recolectora
+        </button>
+        <button class="branch-filter-btn filter-manada ${this.treeBranchFilter === 'manada' ? 'active' : ''}" data-branch="manada">
+          🐾 Manada
+        </button>
+        <button class="branch-filter-btn filter-taller ${this.treeBranchFilter === 'taller' ? 'active' : ''}" data-branch="taller">
+          🍯 Taller
+        </button>
+      </div>
+    `;
+
+    const expandBtn = header.querySelector('#btn-open-tree-modal');
+    if (expandBtn) {
+      expandBtn.onclick = () => this.abrirModalArbol();
+    }
+
+    header.querySelectorAll('.branch-filter-btn').forEach(btn => {
+      btn.onclick = () => {
+        this.treeBranchFilter = btn.dataset.branch;
+        this.renderArbolHabilidades(true);
+        this.sound.playChirp(650, 0.03);
+      };
+    });
+
+    container.appendChild(header);
+
+    // 2. Secciones de Ramas
+    const ramasVisibles = this.treeBranchFilter === 'todas'
+      ? RAMAS_ARBOL
+      : RAMAS_ARBOL.filter(r => r.id === this.treeBranchFilter);
+
+    ramasVisibles.forEach(rama => {
+      const ramaCard = document.createElement('div');
+      ramaCard.className = `branch-section branch-${rama.id}`;
+
+      ramaCard.innerHTML = `
+        <div class="branch-header" style="border-left-color: ${rama.color};">
+          <span class="branch-icon">${rama.icono}</span>
+          <div class="branch-meta">
+            <h4>${rama.nombre}</h4>
+            <small>${rama.tagline}</small>
+          </div>
+        </div>
+        <div class="branch-nodes-list"></div>
       `;
 
-      card.querySelector('.buy-btn').onclick = () => {
-        if (s.maquis >= mejora.costo) {
-          s.maquis -= mejora.costo;
-          mejora.comprada = true;
-          mejora.efecto(s);
-          this.sound.playChime();
-          this.notify(`¡Mejora desbloqueada: ${mejora.nombre}!`, 'success');
+      const nodesList = ramaCard.querySelector('.branch-nodes-list');
+
+      rama.nodos.forEach(nodeId => {
+        const nodo = arbol[nodeId];
+        if (!nodo) return;
+
+        const cumplidos = this.state.cumplePrerrequisitos(nodeId);
+        const puedeComprar = this.state.puedeAprenderHabilidad(nodeId);
+        const esSeleccionado = this.selectedSkillId === nodeId;
+
+        let estadoClase = 'locked-prereqs';
+        let estadoBadge = '🔒 Bloqueada';
+
+        if (nodo.comprada) {
+          estadoClase = 'learned';
+          estadoBadge = '✓ Aprendida';
+        } else if (puedeComprar) {
+          estadoClase = 'available';
+          estadoBadge = `✨ Desbloquear (🌰 ${nodo.costo.toLocaleString()})`;
+        } else if (cumplidos) {
+          estadoClase = 'affordable-wait';
+          estadoBadge = `🌰 ${nodo.costo.toLocaleString()}`;
         }
+
+        // Pill de prerrequisitos
+        let prereqHtml = '';
+        if (nodo.prerrequisitos && nodo.prerrequisitos.length > 0) {
+          const preItems = nodo.prerrequisitos.map(pid => {
+            const pNodo = arbol[pid];
+            const pOk = pNodo?.comprada;
+            return `<span class="prereq-tag ${pOk ? 'done' : 'missing'}">${pOk ? '✓' : '🔒'} ${pNodo?.nombre || pid}</span>`;
+          }).join(' ');
+          prereqHtml = `<div class="node-prereqs">${preItems}</div>`;
+        }
+
+        const nodeEl = document.createElement('div');
+        nodeEl.className = `skill-node-card ${estadoClase} ${esSeleccionado ? 'selected' : ''}`;
+        nodeEl.dataset.nodeId = nodeId;
+        nodeEl.innerHTML = `
+          <div class="node-icon-wrapper" style="border-color: ${nodo.comprada ? rama.color : 'rgba(255,255,255,0.15)'}">
+            <span class="node-icon">${nodo.icono}</span>
+          </div>
+          <div class="node-info">
+            <div class="node-title-row">
+              <span class="node-name">${nodo.nombre}</span>
+              <span class="node-tier">T${nodo.tier}${nodo.tier === 4 ? ' ⭐' : ''}</span>
+            </div>
+            <div class="node-desc">${nodo.desc}</div>
+            ${prereqHtml}
+          </div>
+          <div class="node-action">
+            <button class="skill-buy-btn ${nodo.comprada ? 'btn-learned' : (puedeComprar ? 'btn-can-buy' : 'btn-disabled')}"
+                    ${!puedeComprar || nodo.comprada ? 'disabled' : ''}>
+              ${estadoBadge}
+            </button>
+          </div>
+        `;
+
+        nodeEl.onclick = (e) => {
+          this.selectedSkillId = nodeId;
+          if (e.target.closest('.skill-buy-btn') && puedeComprar) {
+            const ok = this.state.aprenderHabilidad(nodeId);
+            if (ok) {
+              this.sound.playChime();
+              this.notify(`¡Aprendiste: ${nodo.nombre}! ${nodo.icono}`, 'success');
+              this.renderArbolHabilidades(true);
+              if (this.isTreeModalOpen) this.renderArbolModal();
+            }
+          } else {
+            this.renderArbolHabilidades(true);
+          }
+        };
+
+        nodesList.appendChild(nodeEl);
+      });
+
+      container.appendChild(ramaCard);
+    });
+  }
+
+  actualizarBotonesSidebarArbol() {
+    const s = this.state.data;
+    const arbol = s.arbolHabilidades;
+    if (!arbol) return;
+
+    document.querySelectorAll('.skill-node-card').forEach(card => {
+      const buyBtn = card.querySelector('.skill-buy-btn');
+      if (!buyBtn || !card.dataset.nodeId) return;
+      const nodeId = card.dataset.nodeId;
+      const nodo = arbol[nodeId];
+      if (!nodo || nodo.comprada) return;
+
+      const puedeComprar = this.state.puedeAprenderHabilidad(nodeId);
+      const cumplidos = this.state.cumplePrerrequisitos(nodeId);
+
+      card.classList.toggle('available', puedeComprar);
+      card.classList.toggle('affordable-wait', !puedeComprar && cumplidos);
+      buyBtn.disabled = !puedeComprar;
+      buyBtn.classList.toggle('btn-can-buy', puedeComprar);
+      buyBtn.classList.toggle('btn-disabled', !puedeComprar);
+      if (puedeComprar) {
+        buyBtn.innerText = `✨ Desbloquear (🌰 ${nodo.costo.toLocaleString()})`;
+      } else if (cumplidos) {
+        buyBtn.innerText = `🌰 ${nodo.costo.toLocaleString()}`;
+      }
+    });
+  }
+
+  abrirModalArbol() {
+    this.isTreeModalOpen = true;
+    const modal = document.getElementById('modal-arbol');
+    if (modal) modal.classList.remove('hidden');
+    this.renderArbolModal();
+    this.sound.playChime();
+  }
+
+  cerrarModalArbol() {
+    this.isTreeModalOpen = false;
+    const modal = document.getElementById('modal-arbol');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  renderArbolModal() {
+    const container = document.getElementById('modal-arbol-content');
+    if (!container) return;
+
+    const s = this.state.data;
+    const arbol = s.arbolHabilidades;
+    if (!arbol) return;
+
+    if (!this.selectedSkillId || !arbol[this.selectedSkillId]) {
+      this.selectedSkillId = 'cucharaAlerce';
+    }
+
+    const totalHabilidades = Object.keys(arbol).length;
+    const aprendidas = Object.values(arbol).filter(n => n.comprada).length;
+    const critPct = Math.round((s.probabilidadCritico || 0) * 100);
+
+    container.innerHTML = '';
+
+    // 1. HUD Superior del Modal
+    const hud = document.createElement('div');
+    hud.className = 'tree-modal-hud';
+    hud.innerHTML = `
+      <div class="tree-hud-pill">
+        <span>✨ Habilidades:</span>
+        <strong>${aprendidas} / ${totalHabilidades}</strong>
+      </div>
+      <div class="tree-hud-pill">
+        <span>🌰 Maquis:</span>
+        <strong id="modal-maquis-val">${Math.floor(s.maquis).toLocaleString()}</strong>
+      </div>
+      <div class="tree-hud-pill">
+        <span>🎯 Golpe Crítico:</span>
+        <strong>${critPct}% (x${s.multiplicadorCritico || 5})</strong>
+      </div>
+      <div class="tree-hud-pill">
+        <span>🌿 Armonía del Bosque:</span>
+        <strong>x${s.armonia.toFixed(2)}</strong>
+      </div>
+    `;
+    container.appendChild(hud);
+
+    // 2. Grid de las 3 Ramas (Constelación Visual)
+    const branchesGrid = document.createElement('div');
+    branchesGrid.className = 'tree-modal-branches-grid';
+
+    RAMAS_ARBOL.forEach(rama => {
+      const col = document.createElement('div');
+      col.className = `modal-branch-col branch-col-${rama.id}`;
+
+      // Cabecera de la columna
+      const bHeader = document.createElement('div');
+      bHeader.className = 'modal-branch-header';
+      bHeader.style.borderBottomColor = rama.color;
+      bHeader.innerHTML = `
+        <div class="branch-badge-icon">${rama.icono}</div>
+        <h4>${rama.nombre}</h4>
+        <small>${rama.tagline}</small>
+      `;
+      col.appendChild(bHeader);
+
+      // Contenedor vertical de Tiers
+      const tierContainer = document.createElement('div');
+      tierContainer.className = 'tree-tier-container';
+
+      // Helper para renderizar un nodo en el modal
+      const createModalNode = (nodeId, isUltimate = false) => {
+        const nodo = arbol[nodeId];
+        if (!nodo) return document.createElement('div');
+
+        const cumplidos = this.state.cumplePrerrequisitos(nodeId);
+        const puedeComprar = this.state.puedeAprenderHabilidad(nodeId);
+        const esSeleccionado = this.selectedSkillId === nodeId;
+
+        let stClass = 'locked-prereqs';
+        let stBadge = '🔒 Bloqueada';
+        let stBadgeClass = 'locked';
+
+        if (nodo.comprada) {
+          stClass = 'learned';
+          stBadge = '✓ Activa';
+          stBadgeClass = 'learned';
+        } else if (puedeComprar) {
+          stClass = 'available';
+          stBadge = `🌰 ${nodo.costo.toLocaleString()}`;
+          stBadgeClass = 'can-buy';
+        } else if (cumplidos) {
+          stClass = 'affordable-wait';
+          stBadge = `🌰 ${nodo.costo.toLocaleString()}`;
+          stBadgeClass = 'locked';
+        }
+
+        const card = document.createElement('div');
+        card.className = `modal-node-card ${stClass} ${esSeleccionado ? 'selected' : ''} ${isUltimate ? 'tier-4-ultimate' : ''}`;
+        card.dataset.nodeId = nodeId;
+        card.innerHTML = `
+          <div class="modal-node-icon">${nodo.icono}</div>
+          <div class="modal-node-name">${nodo.nombre}</div>
+          <div class="modal-node-badge ${stBadgeClass}">${stBadge}</div>
+        `;
+
+        card.onclick = () => {
+          this.selectedSkillId = nodeId;
+          this.renderArbolModal();
+          this.sound.playChirp(580, 0.03);
+        };
+
+        return card;
       };
 
-      upgradesContainer.appendChild(card);
+      // TIER 1
+      const rowT1 = document.createElement('div');
+      rowT1.className = 'tier-row';
+      rowT1.appendChild(createModalNode(rama.t1));
+      tierContainer.appendChild(rowT1);
+
+      // Conector T1 -> T2
+      const t1Comprada = arbol[rama.t1]?.comprada;
+      const conn1 = document.createElement('div');
+      conn1.className = `tier-connector ${t1Comprada ? 'active' : ''}`;
+      tierContainer.appendChild(conn1);
+
+      // TIER 2 (Dual: T2-A y T2-B)
+      const rowT2 = document.createElement('div');
+      rowT2.className = 'tier-row-dual';
+      rowT2.appendChild(createModalNode(rama.t2a));
+      rowT2.appendChild(createModalNode(rama.t2b));
+      tierContainer.appendChild(rowT2);
+
+      // Conector T2 -> T3
+      const t2Comprada = arbol[rama.t2a]?.comprada && arbol[rama.t2b]?.comprada;
+      const conn2 = document.createElement('div');
+      conn2.className = `tier-connector ${t2Comprada ? 'active' : ''}`;
+      tierContainer.appendChild(conn2);
+
+      // TIER 3
+      const rowT3 = document.createElement('div');
+      rowT3.className = 'tier-row';
+      rowT3.appendChild(createModalNode(rama.t3));
+      tierContainer.appendChild(rowT3);
+
+      // Conector T3 -> T4
+      const t3Comprada = arbol[rama.t3]?.comprada;
+      const conn3 = document.createElement('div');
+      conn3.className = `tier-connector ${t3Comprada ? 'active' : ''}`;
+      tierContainer.appendChild(conn3);
+
+      // TIER 4 (Ultimate)
+      const rowT4 = document.createElement('div');
+      rowT4.className = 'tier-row';
+      rowT4.appendChild(createModalNode(rama.t4, true));
+      tierContainer.appendChild(rowT4);
+
+      col.appendChild(tierContainer);
+      branchesGrid.appendChild(col);
+    });
+
+    container.appendChild(branchesGrid);
+
+    // 3. Panel Inferior de Inspección y Aprendizaje
+    const detailPanel = document.createElement('div');
+    detailPanel.id = 'modal-skill-detail-panel';
+    detailPanel.className = 'tree-modal-detail-panel';
+    container.appendChild(detailPanel);
+
+    this.actualizarModalDetalle();
+  }
+
+  actualizarModalDetalle() {
+    const s = this.state.data;
+    const arbol = s.arbolHabilidades;
+    if (!arbol) return;
+
+    const maquisHud = document.getElementById('modal-maquis-val');
+    if (maquisHud) maquisHud.innerText = Math.floor(s.maquis).toLocaleString();
+
+    const panel = document.getElementById('modal-skill-detail-panel');
+    if (!panel) return;
+
+    const nodo = arbol[this.selectedSkillId];
+    if (!nodo) return;
+
+    const cumplidos = this.state.cumplePrerrequisitos(this.selectedSkillId);
+    const puedeComprar = this.state.puedeAprenderHabilidad(this.selectedSkillId);
+    const rama = RAMAS_ARBOL.find(r => r.id === nodo.rama) || { nombre: "Bosque", color: "#34d399", icono: "🌲" };
+
+    let prereqText = 'Inicio de la senda (sin requisitos previos)';
+    if (nodo.prerrequisitos && nodo.prerrequisitos.length > 0) {
+      const items = nodo.prerrequisitos.map(pid => {
+        const pNodo = arbol[pid];
+        const ok = pNodo?.comprada;
+        return `<span class="prereq-tag ${ok ? 'done' : 'missing'}">${ok ? '✓' : '🔒'} ${pNodo?.nombre || pid}</span>`;
+      }).join(' ');
+      prereqText = `Requiere: ${items}`;
     }
-    container.appendChild(upgradesContainer);
+
+    let btnText = `✨ Aprender Habilidad (🌰 ${nodo.costo.toLocaleString()})`;
+    let btnClass = 'cta-btn';
+    let btnDisabled = false;
+
+    if (nodo.comprada) {
+      btnText = '✓ Habilidad Aprendida y Activa';
+      btnClass = 'cta-btn secondary';
+      btnDisabled = true;
+    } else if (!cumplidos) {
+      btnText = '🔒 Prerrequisitos pendientes';
+      btnClass = 'cta-btn disabled';
+      btnDisabled = true;
+    } else if (s.maquis < nodo.costo) {
+      const faltan = Math.ceil(nodo.costo - s.maquis);
+      btnText = `🌰 Faltan ${faltan.toLocaleString()} Maquis`;
+      btnClass = 'cta-btn disabled';
+      btnDisabled = true;
+    }
+
+    panel.innerHTML = `
+      <div class="detail-panel-inner">
+        <div class="detail-icon-wrap" style="border-color: ${nodo.comprada ? rama.color : 'rgba(255,255,255,0.2)'};">
+          <span>${nodo.icono}</span>
+        </div>
+        <div class="detail-info-block">
+          <div class="detail-header-row">
+            <span class="detail-title">${nodo.nombre}</span>
+            <span class="detail-branch-tag" style="background: ${rama.color}22; color: ${rama.color}; border: 1px solid ${rama.color}55;">
+              ${rama.icono} ${rama.nombre} • Tier ${nodo.tier}${nodo.tier === 4 ? ' ⭐' : ''}
+            </span>
+          </div>
+          <div class="detail-desc">${nodo.desc}</div>
+          <div class="detail-prereqs-row">${prereqText}</div>
+        </div>
+        <div class="detail-action-block">
+          <button id="btn-learn-modal-skill" class="${btnClass} detail-buy-btn" ${btnDisabled ? 'disabled' : ''}>
+            ${btnText}
+          </button>
+        </div>
+      </div>
+    `;
+
+    const buyBtn = panel.querySelector('#btn-learn-modal-skill');
+    if (buyBtn && puedeComprar) {
+      buyBtn.onclick = () => {
+        const ok = this.state.aprenderHabilidad(this.selectedSkillId);
+        if (ok) {
+          this.sound.playChime();
+          this.notify(`¡Aprendiste: ${nodo.nombre}! ${nodo.icono}`, 'success');
+          this.renderArbolModal();
+          this.renderArbolHabilidades(true);
+        }
+      };
+    }
   }
 
   renderTaller() {

@@ -67,6 +67,9 @@
         <button class="tab-btn" data-tab="refugio">
           <span class="tab-icon">🦌</span> Refugio
         </button>
+        <button class="tab-btn" data-tab="arbol">
+          <span class="tab-icon">🌳</span> Árbol
+        </button>
         <button class="tab-btn" data-tab="taller">
           <span class="tab-icon">🏺</span> Taller
         </button>
@@ -82,17 +85,22 @@
           <div id="tab-cosecha-list" class="cards-list"></div>
         </div>
 
-        <!-- Pestaña 2: El Refugio de Pudús y Mejoras -->
+        <!-- Pestaña 2: El Refugio de Pudús -->
         <div id="tab-refugio" class="tab-content hidden">
           <div id="tab-refugio-list"></div>
         </div>
 
-        <!-- Pestaña 3: El Taller Austral -->
+        <!-- Pestaña 3: Árbol de Habilidades (Raíces de la Armonía) -->
+        <div id="tab-arbol" class="tab-content hidden">
+          <div id="tab-arbol-content"></div>
+        </div>
+
+        <!-- Pestaña 4: El Taller Austral -->
         <div id="tab-taller" class="tab-content hidden">
           <div id="tab-taller-content"></div>
         </div>
 
-        <!-- Pestaña 4: Bitácora del Bosque y Enciclopedia Didáctica -->
+        <!-- Pestaña 5: Bitácora del Bosque y Enciclopedia Didáctica -->
         <div id="tab-bitacora" class="tab-content hidden">
           <div id="tab-bitacora-content"></div>
         </div>
@@ -194,6 +202,23 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Panorámico del Árbol de Habilidades -->
+  <div id="modal-arbol" class="modal-overlay hidden">
+    <div class="modal-card skill-tree-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="modal-icon">🌳</span>
+          <div>
+            <h3>Raíces de la Armonía</h3>
+            <p>Árbol de Habilidades y Maestrías del Bosque</p>
+          </div>
+        </div>
+        <button id="btn-cerrar-arbol" class="btn-icon" title="Cerrar Árbol">✕</button>
+      </div>
+      <div id="modal-arbol-content" class="skill-tree-modal-body"></div>
     </div>
   </div>
 

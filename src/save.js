@@ -29,11 +29,43 @@ export class SaveManager {
           ...INITIAL_STATE.productores,
           ...(loaded.productores || {})
         },
-        mejoras: {
-          ...INITIAL_STATE.mejoras,
-          ...(loaded.mejoras || {})
+        arbolHabilidades: {
+          ...INITIAL_STATE.arbolHabilidades,
+          ...(loaded.arbolHabilidades || {})
         }
       };
+
+      // Restaurar callbacks de efecto en cada nodo del árbol
+      for (const k in INITIAL_STATE.arbolHabilidades) {
+        if (state.data.arbolHabilidades[k]) {
+          state.data.arbolHabilidades[k].efecto = INITIAL_STATE.arbolHabilidades[k].efecto;
+        }
+      }
+
+      // Migrar mejoras compradas de partidas guardadas previas hacia el árbol
+      if (loaded.mejoras && typeof loaded.mejoras === 'object') {
+        for (const k in loaded.mejoras) {
+          if (loaded.mejoras[k]?.comprada) {
+            const targetId = k === 'cantoChucaoArmonico' ? 'oidoChucao' : k;
+            if (state.data.arbolHabilidades[targetId]) {
+              state.data.arbolHabilidades[targetId].comprada = true;
+              state.data.arbolHabilidades[targetId].desbloqueada = true;
+            }
+          }
+        }
+      }
+
+      // Sincronizar hijos desbloqueados en el árbol
+      for (const key in state.data.arbolHabilidades) {
+        const nodo = state.data.arbolHabilidades[key];
+        if (nodo.prerrequisitos && nodo.prerrequisitos.length > 0) {
+          if (nodo.prerrequisitos.some(preId => state.data.arbolHabilidades[preId]?.comprada)) {
+            nodo.desbloqueada = true;
+          }
+        }
+      }
+
+      state.sincronizarMejorasLegacy();
 
       // Asegurar que si hay pudús nuevos en INITIAL_STATE (como Miku-Pudú), se sincronicen
       if (Array.isArray(state.data.pudus)) {

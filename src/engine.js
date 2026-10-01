@@ -100,7 +100,7 @@ export class GameEngine {
       this.chucaoSpawnTimer -= dt;
       if (this.chucaoSpawnTimer <= 0) {
         this.spawnChucao();
-        const baseCooldown = s.mejoras.cantoChucaoArmonico?.comprada ? 50 : 75;
+        const baseCooldown = (s.arbolHabilidades?.oidoChucao?.comprada || s.mejoras?.cantoChucaoArmonico?.comprada) ? 50 : 75;
         this.chucaoSpawnTimer = baseCooldown + Math.random() * 40;
       }
     }
@@ -110,7 +110,8 @@ export class GameEngine {
       this.bayaDoradaTimer -= dt;
       if (this.bayaDoradaTimer <= 0) {
         this.spawnBayaDorada();
-        this.bayaDoradaTimer = 65 + Math.random() * 45;
+        const baseBaya = s.arbolHabilidades?.oidoChucao?.comprada ? 45 : 65;
+        this.bayaDoradaTimer = baseBaya + Math.random() * 40;
       }
     }
 
@@ -179,7 +180,7 @@ export class GameEngine {
 
     s.chucao.activo = false;
     s.chucao.multiplicadorSuerte = 3;
-    const duracion = s.mejoras.cantoChucaoArmonico?.comprada ? 45 : 30;
+    const duracion = (s.arbolHabilidades?.oidoChucao?.comprada || s.mejoras?.cantoChucaoArmonico?.comprada) ? 45 : 30;
     s.chucao.segundosRestantesSuerte = duracion;
 
     // Bono inmediato de bayas
@@ -218,7 +219,6 @@ export class GameEngine {
     // Fase 3 a Fase 4: El Taller Austral
     if (s.fase === 3 && s.totalMaquis >= 18000) {
       s.fase = 4;
-      s.mejoras.recetaMermelada.desbloqueada = true;
       this.sound.playChime();
       this.ui.notify("¡Se desbloqueó El Taller del Bosque! Ahora puedes cocinar mermeladas en greda.", "hito");
       this.desbloquearRecuerdo("recuerdo_4");
@@ -233,13 +233,6 @@ export class GameEngine {
       this.ui.notify("¡La manada está lista para organizar El Gran Picnic!", "hito");
       this.desbloquearRecuerdo("recuerdo_3");
     }
-
-    // Desbloqueo gradual de mejoras según maquis acumulados
-    if (s.totalMaquis >= 120) s.mejoras.zapatosMusgo.desbloqueada = true;
-    if (s.totalMaquis >= 650) s.mejoras.bufandasChilotas.desbloqueada = true;
-    if (s.totalMaquis >= 2400) s.mejoras.teCanelo.desbloqueada = true;
-    if (s.totalMaquis >= 10000) s.mejoras.cantoChucaoArmonico.desbloqueada = true;
-    if (s.totalMaquis >= 24000) s.mejoras.coronaCopihues.desbloqueada = true;
   }
 
   desbloquearFichaDidactica(id) {
