@@ -289,6 +289,21 @@ body {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.sidebar-tabs .tab-btn[data-tab="arbol"] {
+  color: #6ee7b7;
+}
+
+.sidebar-tabs .tab-btn[data-tab="arbol"]:hover {
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.sidebar-tabs .tab-btn[data-tab="arbol"].active {
+  color: #34d399;
+  border-bottom-color: #10b981;
+  background: rgba(16, 185, 129, 0.2);
+}
+
 /* Contenido Scrolleable de Mejoras */
 .sidebar-content {
   flex: 1;
@@ -531,6 +546,22 @@ body {
 .water-badge {
   background: linear-gradient(135deg, #0284c7, #0369a1);
   border: 1px solid #7dd3fc;
+}
+
+.tree-hud-badge {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9));
+  border: 1px solid #6ee7b7;
+  cursor: pointer;
+  pointer-events: auto;
+  font-family: var(--font-heading);
+  animation: none;
+  transition: all 0.2s ease;
+}
+
+.tree-hud-badge:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #10b981, #047857);
 }
 
 @keyframes bounce-badge {

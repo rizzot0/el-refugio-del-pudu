@@ -223,6 +223,15 @@ export class GameUI {
       });
     }
 
+    // 7.2 Botón de HUD para abrir Árbol de Habilidades
+    const hudTreeBtn = document.getElementById('hud-btn-arbol');
+    if (hudTreeBtn) {
+      hudTreeBtn.addEventListener('click', () => {
+        this.switchTab('arbol');
+        this.abrirModalArbol();
+      });
+    }
+
     // 8. Reiniciar partida
     const resetBtn = document.getElementById('btn-reset');
     if (resetBtn) {
@@ -242,6 +251,9 @@ export class GameUI {
     document.querySelectorAll('.sidebar-content .tab-content').forEach(c => {
       c.classList.toggle('hidden', c.id !== `tab-${tabName}`);
     });
+    if (tabName === 'arbol') {
+      this.renderArbolHabilidades(true);
+    }
     this.sound.playChirp(600, 0.04);
   }
 
@@ -524,7 +536,7 @@ export class GameUI {
 
     // Throttle de refresco visual para evitar reconstruir el DOM en cada frame
     const now = performance.now();
-    if (!force && this._lastArbolRenderTime && (now - this._lastArbolRenderTime < 300)) {
+    if (!force && container.children.length > 0 && this._lastArbolRenderTime && (now - this._lastArbolRenderTime < 300)) {
       this.actualizarBotonesSidebarArbol();
       return;
     }
