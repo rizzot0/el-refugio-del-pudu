@@ -195,6 +195,22 @@ export const INITIAL_STATE = {
   // Árbol de Habilidades: "Raíces de la Armonía" (3 Ramas Estratégicas)
   arbolHabilidades: {
     // === RAMA 1: SENDA DEL RECOLECTOR (Clicks & Microeventos Activos) ===
+    // === NODO RAÍZ CENTRAL (Semilla del Canelo) ===
+    semillaCanelo: {
+      id: "semillaCanelo",
+      nombre: "Semilla del Canelo",
+      rama: "centro",
+      tier: 0,
+      costo: 0,
+      icono: "🌰",
+      desc: "El árbol sagrado del pueblo mapuche y corazón espiritual del claro.",
+      prerrequisitos: [],
+      desbloqueada: true,
+      comprada: true,
+      efecto: () => {}
+    },
+
+    // === RAMA 1: SENDA DEL RECOLECTOR (Clicks & Microeventos Activos) ===
     cucharaAlerce: {
       id: "cucharaAlerce",
       nombre: "Cuchara de Alerce",
@@ -203,10 +219,23 @@ export const INITIAL_STATE = {
       costo: 35,
       icono: "🥄",
       desc: "Tallada a mano. +2 maquis directos por cada click manual en el arbusto.",
-      prerrequisitos: [],
+      prerrequisitos: ["semillaCanelo"],
       desbloqueada: true,
       comprada: false,
       efecto: (s) => { s.maquisPerClick += 2; }
+    },
+    brotesRapidos: {
+      id: "brotesRapidos",
+      nombre: "Brotes Rápidos",
+      rama: "recolector",
+      tier: 2,
+      costo: 90,
+      icono: "🌱",
+      desc: "Cosecha ágil: +1 maqui base adicional en cada clic manual.",
+      prerrequisitos: ["cucharaAlerce"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: (s) => { s.maquisPerClick += 1; }
     },
     cosechaCertera: {
       id: "cosechaCertera",
@@ -221,6 +250,19 @@ export const INITIAL_STATE = {
       comprada: false,
       efecto: (s) => { s.probabilidadCritico = 0.18; s.multiplicadorCritico = 5; }
     },
+    punteriaAustral: {
+      id: "punteriaAustral",
+      nombre: "Puntería Austral",
+      rama: "recolector",
+      tier: 3,
+      costo: 420,
+      icono: "✨",
+      desc: "Precisión en los arbustos: +3% de probabilidad adicional de Golpe Crítico.",
+      prerrequisitos: ["cosechaCertera"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: (s) => { s.probabilidadCritico += 0.03; }
+    },
     oidoChucao: {
       id: "oidoChucao",
       nombre: "Trino del Chucao",
@@ -233,6 +275,19 @@ export const INITIAL_STATE = {
       desbloqueada: false,
       comprada: false,
       efecto: (s) => { s.armonia *= 1.15; }
+    },
+    suerteProlongada: {
+      id: "suerteProlongada",
+      nombre: "Suerte Prolongada",
+      rama: "recolector",
+      tier: 3,
+      costo: 600,
+      icono: "⏳",
+      desc: "El canto de buena fortuna del Chucao dura 15 segundos adicionales.",
+      prerrequisitos: ["oidoChucao"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: () => {}
     },
     teCanelo: {
       id: "teCanelo",
@@ -270,13 +325,26 @@ export const INITIAL_STATE = {
       costo: 60,
       icono: "🌿",
       desc: "Camas mullidas. +20% a la producción base de brotes de maqui y camitas de musgo.",
-      prerrequisitos: [],
+      prerrequisitos: ["semillaCanelo"],
       desbloqueada: true,
       comprada: false,
       efecto: (s) => {
         s.productores.broteMaqui.produccionBase *= 1.2;
         s.productores.camitaMusgo.produccionBase *= 1.2;
       }
+    },
+    camitasAcolchadas: {
+      id: "camitasAcolchadas",
+      nombre: "Camitas Acolchadas",
+      rama: "manada",
+      tier: 2,
+      costo: 110,
+      icono: "🛏️",
+      desc: "+15% de producción base a todas las Camitas de Musgo del refugio.",
+      prerrequisitos: ["nidoHojarasca"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: (s) => { s.productores.camitaMusgo.produccionBase *= 1.15; }
     },
     zapatosMusgo: {
       id: "zapatosMusgo",
@@ -291,6 +359,19 @@ export const INITIAL_STATE = {
       comprada: false,
       efecto: (s) => { s.armonia *= 1.35; }
     },
+    pasosSilenciosos: {
+      id: "pasosSilenciosos",
+      nombre: "Pasos Silenciosos",
+      rama: "manada",
+      tier: 3,
+      costo: 380,
+      icono: "🐾",
+      desc: "+15% de velocidad a los pudús al trotar por el claro, generando maquis con más alegría.",
+      prerrequisitos: ["zapatosMusgo"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: () => {}
+    },
     bufandasChilotas: {
       id: "bufandasChilotas",
       nombre: "Bufandas Chilotas",
@@ -303,6 +384,19 @@ export const INITIAL_STATE = {
       desbloqueada: false,
       comprada: false,
       efecto: (s) => { s.armonia *= 1.4; }
+    },
+    ternuraCervatillos: {
+      id: "ternuraCervatillos",
+      nombre: "Ternura de Cervatillos",
+      rama: "manada",
+      tier: 3,
+      costo: 720,
+      icono: "🦌",
+      desc: "+5% adicional de producción pasiva por cada cría residente en el claro.",
+      prerrequisitos: ["bufandasChilotas"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: () => {}
     },
     armoniaVocal: {
       id: "armoniaVocal",
@@ -340,8 +434,34 @@ export const INITIAL_STATE = {
       costo: 90,
       icono: "🪵",
       desc: "Brasas duraderas. Reduce el tiempo de cocción en la olla de greda un 25%.",
-      prerrequisitos: [],
+      prerrequisitos: ["semillaCanelo"],
       desbloqueada: true,
+      comprada: false,
+      efecto: () => {}
+    },
+    brasasEternas: {
+      id: "brasasEternas",
+      nombre: "Brasas Eternas",
+      rama: "taller",
+      tier: 2,
+      costo: 150,
+      icono: "🪵",
+      desc: "Reduce un 10% adicional el tiempo de cocción de todas las recetas en la olla.",
+      prerrequisitos: ["lenaLuma"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: () => {}
+    },
+    fuegosVivos: {
+      id: "fuegosVivos",
+      nombre: "Fuegos Vivos",
+      rama: "taller",
+      tier: 2,
+      costo: 280,
+      icono: "🔥",
+      desc: "Los buffs de kuchen y cocina duran 15% más de tiempo en el claro.",
+      prerrequisitos: ["lenaLuma"],
+      desbloqueada: false,
       comprada: false,
       efecto: () => {}
     },
@@ -358,6 +478,19 @@ export const INITIAL_STATE = {
       comprada: false,
       efecto: () => {}
     },
+    dulzorAustral: {
+      id: "dulzorAustral",
+      nombre: "Dulzor Austral",
+      rama: "taller",
+      tier: 3,
+      costo: 640,
+      icono: "🍯",
+      desc: "+2% adicional de Armonía permanente por cada frasco de mermelada elaborado.",
+      prerrequisitos: ["recetaMermelada"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: () => {}
+    },
     amuletoArcoiris: {
       id: "amuletoArcoiris",
       nombre: "Amuleto de Arcoíris",
@@ -367,6 +500,19 @@ export const INITIAL_STATE = {
       icono: "🌈",
       desc: "El clima de Arcoíris y Sol es más frecuente y multiplica la producción x2.5.",
       prerrequisitos: ["lenaLuma"],
+      desbloqueada: false,
+      comprada: false,
+      efecto: () => {}
+    },
+    brilloSolar: {
+      id: "brilloSolar",
+      nombre: "Brillo Solar",
+      rama: "taller",
+      tier: 3,
+      costo: 1100,
+      icono: "☀️",
+      desc: "El clima de Arcoíris y Sol dura 30 segundos adicionales al despejarse.",
+      prerrequisitos: ["amuletoArcoiris"],
       desbloqueada: false,
       comprada: false,
       efecto: () => {}

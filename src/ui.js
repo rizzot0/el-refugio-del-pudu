@@ -4,6 +4,7 @@
 import { giftConfig } from './giftConfig.js';
 import { SaveManager } from './save.js';
 import { FAUNA_FLORA_DATA } from './faunaData.js';
+import { SkillWebUI } from './skillWeb.js';
 
 export const RAMAS_ARBOL = [
   {
@@ -59,6 +60,8 @@ export class GameUI {
     this.selectedSkillId = 'cucharaAlerce';
     this.treeBranchFilter = 'todas';
     this.isTreeModalOpen = false;
+
+    this.skillWeb = new SkillWebUI(this.state, this.sound, this);
 
     this.setupListeners();
   }
@@ -223,12 +226,11 @@ export class GameUI {
       });
     }
 
-    // 7.2 Botón de HUD para abrir Árbol de Habilidades
+    // 7.2 Botón de HUD para abrir Árbol de Habilidades (Constelación 2D)
     const hudTreeBtn = document.getElementById('hud-btn-arbol');
     if (hudTreeBtn) {
       hudTreeBtn.addEventListener('click', () => {
-        this.switchTab('arbol');
-        this.abrirModalArbol();
+        this.skillWeb.open();
       });
     }
 
@@ -253,6 +255,7 @@ export class GameUI {
     });
     if (tabName === 'arbol') {
       this.renderArbolHabilidades(true);
+      this.skillWeb.open();
     }
     this.sound.playChirp(600, 0.04);
   }
@@ -393,6 +396,12 @@ export class GameUI {
     if (this.isTreeModalOpen) {
       this.actualizarModalDetalle();
     }
+
+    // 7. Actualizar pantalla de constelación 2D si está abierta
+    if (this.skillWeb && this.skillWeb.isOpen) {
+      this.skillWeb.renderHUD();
+      this.skillWeb.updateInspectorButton();
+    }
   }
 
   renderCosecha() {
@@ -500,6 +509,7 @@ export class GameUI {
 
     // Acceso al Árbol de Habilidades
     const totalAprendidas = Object.values(s.arbolHabilidades || {}).filter(n => n.comprada).length;
+    const totalHabilidades = Object.keys(s.arbolHabilidades || {}).length;
     const subheader = document.createElement('div');
     subheader.className = 'section-header';
     subheader.innerHTML = `<h4>Comodidades y Armonía del Refugio</h4>`;
@@ -508,16 +518,16 @@ export class GameUI {
     const promoCard = document.createElement('div');
     promoCard.className = 'tree-promo-card';
     promoCard.innerHTML = `
-      <div class="tree-promo-icon">🌳</div>
+      <div class="tree-promo-icon">🌌</div>
       <div class="tree-promo-info">
-        <strong>Árbol de Habilidades: Raíces de la Armonía</strong>
-        <p>Las comodidades y maestrías del bosque ahora florecen en el Árbol de Habilidades.</p>
-        <div class="tree-promo-stats">✨ ${totalAprendidas} / 15 Habilidades Aprendidas</div>
+        <strong>Constelación de Habilidades: Raíces de la Armonía</strong>
+        <p>Las comodidades y maestrías del bosque florecen en la red de constelaciones 2D.</p>
+        <div class="tree-promo-stats">✨ ${totalAprendidas} / ${totalHabilidades} Habilidades Aprendidas</div>
       </div>
-      <button class="cta-btn secondary btn-tree-goto">Ver Árbol 🌿</button>
+      <button class="cta-btn secondary btn-tree-goto">Explorar Constelación 🌌</button>
     `;
     promoCard.querySelector('.btn-tree-goto').onclick = () => {
-      this.switchTab('arbol');
+      this.skillWeb.open();
     };
     container.appendChild(promoCard);
   }
@@ -548,18 +558,27 @@ export class GameUI {
 
     container.innerHTML = '';
 
-    // 1. Encabezado del Árbol con Progreso y Botón de Expandir
+    // 1. Encabezado del Árbol con Progreso y Botón de Constelación
     const header = document.createElement('div');
     header.className = 'tree-sidebar-header';
     header.innerHTML = `
       <div class="tree-header-top">
         <div>
           <h3>🌳 Raíces de la Armonía</h3>
-          <p class="tree-subtitle">Árbol de Habilidades y Maestrías</p>
+          <p class="tree-subtitle">Constelación y Grafo de Habilidades</p>
         </div>
         <button id="btn-open-tree-modal" class="tree-expand-btn" title="Ver en pantalla completa">
-          🔍 Panorámico
+          🌌 Constelación
         </button>
+      </div>
+
+      <div class="tree-promo-card" style="margin: 10px 0; border: 1px solid rgba(251, 191, 36, 0.4); background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(0,0,0,0.4));">
+        <div class="tree-promo-icon">🌌</div>
+        <div class="tree-promo-info">
+          <strong>Modo Constelación 2D Activo</strong>
+          <p>Navega con Pan/Zoom, nodos en rombo y circuitos dorados interactivos.</p>
+        </div>
+        <button id="btn-hero-launch-web" class="cta-btn hero-launch-btn">Abrir Grafo 🚀</button>
       </div>
 
       <div class="tree-progress-box">
@@ -590,7 +609,12 @@ export class GameUI {
 
     const expandBtn = header.querySelector('#btn-open-tree-modal');
     if (expandBtn) {
-      expandBtn.onclick = () => this.abrirModalArbol();
+      expandBtn.onclick = () => this.skillWeb.open();
+    }
+
+    const heroLaunchBtn = header.querySelector('#btn-hero-launch-web');
+    if (heroLaunchBtn) {
+      heroLaunchBtn.onclick = () => this.skillWeb.open();
     }
 
     header.querySelectorAll('.branch-filter-btn').forEach(btn => {

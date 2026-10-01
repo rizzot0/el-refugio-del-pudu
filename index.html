@@ -225,6 +225,87 @@
     </div>
   </div>
 
+  <!-- Vista de Grafo de Habilidades Estilo Constelación (Referencia Visual del Usuario) -->
+  <div id="skill-web-screen" class="skill-web-screen hidden">
+    <!-- Barra Superior de Navegación idéntica a la captura -->
+    <header class="skill-web-topbar">
+      <div class="skill-web-brand">
+        <span class="skill-brand-icon">🌳</span>
+        <div>
+          <h2>El Refugio</h2>
+          <small>Árbol de Habilidades</small>
+        </div>
+      </div>
+      <nav class="skill-web-nav">
+        <button class="web-nav-btn" data-target-tab="cosecha">🫐 Cosecha</button>
+        <button class="web-nav-btn" data-target-tab="refugio">🦌 Refugio</button>
+        <button class="web-nav-btn active" data-target-tab="arbol">🌳 Habilidades</button>
+        <button class="web-nav-btn" data-target-tab="taller">🏺 Taller</button>
+        <button class="web-nav-btn" data-target-tab="bitacora">📜 Bitácora</button>
+      </nav>
+      <div class="skill-web-resources">
+        <div class="web-res-item">
+          <span>🌰 Maquis:</span>
+          <strong id="web-res-maquis">0</strong>
+        </div>
+        <div class="web-res-item">
+          <span>🎯 Crítico:</span>
+          <strong id="web-res-crit">0%</strong>
+        </div>
+        <div class="web-res-item">
+          <span>✨ Desbloqueado:</span>
+          <strong id="web-res-progress">0%</strong>
+        </div>
+        <button id="btn-close-skill-web" class="btn-icon" title="Volver al Bosque">✕</button>
+      </div>
+    </header>
+
+    <!-- Lienzo Interactivo con Pan y Zoom -->
+    <div id="skill-web-viewport" class="skill-web-viewport">
+      <div id="skill-web-canvas" class="skill-web-canvas">
+        <!-- SVG para las líneas doradas y circuitos -->
+        <svg id="skill-web-svg" class="skill-web-svg"></svg>
+        <!-- Nodos HTML interactivos posicionados en (x, y) -->
+        <div id="skill-web-nodes" class="skill-web-nodes"></div>
+      </div>
+
+      <!-- Controles Flotantes de Zoom / Recentrar -->
+      <div class="skill-web-controls">
+        <button id="web-zoom-in" class="ctrl-btn" title="Acercar">+</button>
+        <button id="web-zoom-reset" class="ctrl-btn" title="Centrar">⟲</button>
+        <button id="web-zoom-out" class="ctrl-btn" title="Alejar">−</button>
+      </div>
+
+      <!-- Leyenda / Pistas de Navegación -->
+      <div class="skill-web-hint">
+        🖱️ Arrastra para moverte • 🔍 Rueda para zoom • Clic en un nodo para inspeccionar y comprar
+      </div>
+
+      <!-- Tarjeta Flotante de Inspección / Compra del Nodo -->
+      <div id="skill-web-inspector" class="skill-web-inspector hidden">
+        <div class="inspector-header">
+          <div class="inspector-icon-wrap" id="inspector-icon-wrap">
+            <span id="inspector-icon">🥄</span>
+          </div>
+          <div class="inspector-titles">
+            <div id="inspector-branch" class="inspector-branch">🍃 Senda Recolectora</div>
+            <h3 id="inspector-name">Cuchara de Alerce</h3>
+          </div>
+          <button id="btn-close-inspector" class="inspector-close-btn">✕</button>
+        </div>
+        <div id="inspector-desc" class="inspector-desc">
+          Tallada a mano. +2 maquis directos por cada click manual en el arbusto.
+        </div>
+        <div id="inspector-prereqs" class="inspector-prereqs"></div>
+        <div class="inspector-action">
+          <button id="inspector-buy-btn" class="cta-btn web-btn-buy">
+            ✨ Aprender Habilidad
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>
