@@ -87,7 +87,14 @@ export const SKILL_GRAPH_EDGES = [
 
   // Enlaces transversales de armonía entre ramas (como en la referencia)
   ['cucharaAlerce', 'lenaLuma'],
-  ['nidoHojarasca', 'lenaLuma']
+  ['nidoHojarasca', 'lenaLuma'],
+  ['cucharaAlerce', 'nidoHojarasca'],
+  ['oidoChucao', 'bufandasChilotas'],
+  ['suerteProlongada', 'amuletoArcoiris'],
+  ['ternuraCervatillos', 'dulzorAustral'],
+  ['teCanelo', 'armoniaVocal'],
+  ['armoniaVocal', 'coronaCopihues'],
+  ['teCanelo', 'coronaCopihues']
 ];
 
 export class SkillWebUI {
@@ -273,13 +280,17 @@ export class SkillWebUI {
     const arbol = s.arbolHabilidades;
     if (!arbol) return;
 
-    const total = Object.keys(arbol).length;
-    const aprendidas = Object.values(arbol).filter(n => n.comprada).length;
-    const pct = Math.round((aprendidas / total) * 100);
+    let totalNiveles = 0;
+    let maxNiveles = 0;
+    for (const k in arbol) {
+      totalNiveles += (arbol[k].nivel || 0);
+      maxNiveles += (arbol[k].maxNivel || 20);
+    }
+    const pct = Math.round((totalNiveles / maxNiveles) * 100);
 
     if (this.resMaquis) this.resMaquis.innerText = Math.floor(s.maquis).toLocaleString();
     if (this.resCrit) this.resCrit.innerText = `${Math.round((s.probabilidadCritico || 0) * 100)}% (x${s.multiplicadorCritico || 5})`;
-    if (this.resProgress) this.resProgress.innerText = `${aprendidas} / ${total} (${pct}%)`;
+    if (this.resProgress) this.resProgress.innerText = `Nvl ${totalNiveles} / ${maxNiveles} (${pct}%)`;
   }
 
   renderLines() {
@@ -308,13 +319,13 @@ export class SkillWebUI {
       const fromData = arbol[fromId];
       const toData = arbol[toId];
 
-      const fromComprada = fromData?.comprada;
-      const toComprada = toData?.comprada;
+      const fromNivel = fromData?.nivel || 0;
+      const toNivel = toData?.nivel || 0;
 
       let lineClass = 'web-edge-locked';
-      if (fromComprada && toComprada) {
+      if (fromNivel > 0 && toNivel > 0) {
         lineClass = 'web-edge-learned';
-      } else if (fromComprada && toData?.desbloqueada) {
+      } else if (fromNivel > 0 && (toNivel > 0 || toData?.desbloqueada)) {
         lineClass = 'web-edge-available';
       }
 
@@ -343,8 +354,15 @@ export class SkillWebUI {
       const puedeComprar = this.state.puedeAprenderHabilidad(id);
       const esSeleccionado = this.selectedId === id;
 
+      const nivel = nodo.nivel || 0;
+      const maxNivel = nodo.maxNivel || 20;
+      const esMax = nivel >= maxNivel;
+      const estaAprendida = nivel > 0;
+
       let statusClass = 'node-locked';
-      if (nodo.comprada) {
+      if (esMax) {
+        statusClass = 'node-maxed';
+      } else if (estaAprendida) {
         statusClass = 'node-learned';
       } else if (puedeComprar) {
         statusClass = 'node-available';
@@ -358,9 +376,14 @@ export class SkillWebUI {
       nodeEl.style.top = `${graphNode.y}px`;
       nodeEl.dataset.nodeId = id;
 
+      const badgeHtml = estaAprendida
+        ? `<div class="web-node-badge-level ${esMax ? 'maxed' : ''}">${esMax ? 'MAX' : `${nivel}/${maxNivel}`}</div>`
+        : '';
+
       nodeEl.innerHTML = `
-        <div class="web-node-inner" style="border-color: ${nodo.comprada ? '#fbbf24' : (puedeComprar ? '#f59e0b' : 'rgba(255,255,255,0.12)')}">
+        <div class="web-node-inner" style="border-color: ${esMax ? '#fbbf24' : (estaAprendida ? '#f59e0b' : (puedeComprar ? '#f59e0b' : 'rgba(255,255,255,0.12)'))}">
           <span class="web-node-icon">${nodo.icono}</span>
+          ${badgeHtml}
         </div>
       `;
 
@@ -376,6 +399,12 @@ export class SkillWebUI {
     }
   }
 
+  getBonusDesc(nodo, nivel) {
+    if (nivel <= 0) return 'Sin desbloquear (Nivel 0)';
+    const pctMPS = nivel * 3;
+    return `+${pctMPS}% Producción pasiva/seg (+${pctMPS}% MPS general)`;
+  }
+
   renderInspector() {
     if (!this.inspector) return;
     const arbol = this.state.data.arbolHabilidades;
@@ -386,8 +415,6 @@ export class SkillWebUI {
 
     const nodo = arbol[this.selectedId];
     const graphNode = SKILL_GRAPH_NODES[this.selectedId] || { branch: 'recolector', color: '#10b981' };
-    const cumplidos = this.state.cumplePrerrequisitos(this.selectedId);
-    const puedeComprar = this.state.puedeAprenderHabilidad(this.selectedId);
 
     this.inspector.classList.remove('hidden');
 
@@ -396,7 +423,6 @@ export class SkillWebUI {
     const nameEl = document.getElementById('inspector-name');
     const descEl = document.getElementById('inspector-desc');
     const prereqsEl = document.getElementById('inspector-prereqs');
-    const buyBtn = document.getElementById('inspector-buy-btn');
 
     if (iconEl) iconEl.innerText = nodo.icono;
     if (nameEl) nameEl.innerText = nodo.nombre;
@@ -408,24 +434,55 @@ export class SkillWebUI {
       taller: "🍯 Senda del Taller"
     };
 
+    const nivel = nodo.nivel || 0;
+    const maxNivel = nodo.maxNivel || 20;
+    const esMax = nivel >= maxNivel;
+
     if (branchEl) {
-      branchEl.innerText = `${branchNames[nodo.rama] || "Bosque"} • Tier ${nodo.tier || 0}${nodo.tier === 4 ? ' ⭐' : ''}`;
+      branchEl.innerText = `${branchNames[nodo.rama] || "Bosque"} • Tier ${nodo.tier || 0}${nodo.tier === 4 ? ' ⭐' : ''} • Nivel ${nivel}/${maxNivel}`;
       branchEl.style.color = graphNode.color;
     }
 
     if (descEl) descEl.innerText = nodo.desc;
+
+    // Barra de nivel dentro del inspector
+    let levelEl = document.getElementById('inspector-level-info');
+    if (!levelEl) {
+      levelEl = document.createElement('div');
+      levelEl.id = 'inspector-level-info';
+      levelEl.className = 'inspector-level-box';
+      const descContainer = descEl?.parentElement;
+      if (descContainer) descContainer.insertBefore(levelEl, prereqsEl);
+    }
+
+    if (levelEl) {
+      levelEl.innerHTML = `
+        <div class="inspector-level-header">
+          <span class="inspector-level-text">Nivel: <strong>${nivel} / ${maxNivel}</strong></span>
+          <span class="inspector-level-bonus">+${nivel * 3}% Prod/seg global</span>
+        </div>
+        <div class="inspector-level-track">
+          <div class="inspector-level-fill ${esMax ? 'maxed' : ''}" style="width: ${(nivel / maxNivel) * 100}%;"></div>
+        </div>
+        <div class="inspector-stats-row">
+          <small class="stat-current">📊 Nivel Actual: <strong>${this.getBonusDesc(nodo, nivel)}</strong></small>
+          ${!esMax ? `<small class="stat-next">✨ Próximo Nivel: <strong>${this.getBonusDesc(nodo, nivel + 1)}</strong></small>` : '<small class="stat-maxed">⭐ ¡Habilidad al Nivel Máximo!</small>'}
+        </div>
+      `;
+    }
 
     // Prerrequisitos
     if (prereqsEl) {
       if (nodo.prerrequisitos && nodo.prerrequisitos.length > 0) {
         const items = nodo.prerrequisitos.map(pid => {
           const pNodo = arbol[pid];
-          const ok = pNodo?.comprada;
+          const ok = pNodo && (pNodo.nivel > 0 || pNodo.comprada);
           return `<span class="prereq-pill ${ok ? 'ok' : 'pending'}">${ok ? '✓' : '🔒'} ${pNodo?.nombre || pid}</span>`;
         }).join('');
-        prereqsEl.innerHTML = `<div class="prereqs-title">Requisitos previos:</div><div class="prereqs-list">${items}</div>`;
+        const conexionTipo = nodo.modoPrerrequisito === 'any' ? '(Cualquiera conecta)' : '(Todos requeridos)';
+        prereqsEl.innerHTML = `<div class="prereqs-title">Conexiones previas ${conexionTipo}:</div><div class="prereqs-list">${items}</div>`;
       } else {
-        prereqsEl.innerHTML = `<div class="prereqs-title">✨ Raíz inicial disponible sin requisitos</div>`;
+        prereqsEl.innerHTML = `<div class="prereqs-title">✨ Raíz inicial conectada sin requisitos</div>`;
       }
     }
 
@@ -442,10 +499,13 @@ export class SkillWebUI {
     if (!nodo) return;
 
     const cumplidos = this.state.cumplePrerrequisitos(this.selectedId);
+    const nivel = nodo.nivel || 0;
+    const maxNivel = nodo.maxNivel || 20;
+    const esMax = nivel >= maxNivel;
 
-    if (nodo.comprada) {
-      buyBtn.innerHTML = `✓ Habilidad Aprendida y Activa`;
-      buyBtn.className = 'cta-btn secondary web-btn-disabled';
+    if (esMax) {
+      buyBtn.innerHTML = `👑 Nivel Máximo Alcanzado (20/20)`;
+      buyBtn.className = 'cta-btn secondary web-btn-disabled maxed';
       buyBtn.disabled = true;
       buyBtn.onclick = null;
     } else if (!cumplidos) {
@@ -455,12 +515,13 @@ export class SkillWebUI {
       buyBtn.onclick = null;
     } else if (this.state.data.maquis < nodo.costo) {
       const faltan = Math.ceil(nodo.costo - this.state.data.maquis);
-      buyBtn.innerHTML = `🌰 Faltan ${faltan.toLocaleString()} Maquis (${nodo.costo.toLocaleString()} 🌰)`;
+      buyBtn.innerHTML = `🌰 Faltan ${faltan.toLocaleString()} Maquis (Subir a Nvl ${nivel + 1})`;
       buyBtn.className = 'cta-btn disabled web-btn-disabled';
       buyBtn.disabled = true;
       buyBtn.onclick = null;
     } else {
-      buyBtn.innerHTML = `✨ Aprender Habilidad (🌰 ${nodo.costo.toLocaleString()})`;
+      const accion = nivel === 0 ? 'Desbloquear' : 'Mejorar';
+      buyBtn.innerHTML = `✨ ${accion} a Nivel ${nivel + 1} (🌰 ${nodo.costo.toLocaleString()})`;
       buyBtn.className = 'cta-btn web-btn-buy';
       buyBtn.disabled = false;
       buyBtn.onclick = () => {
@@ -468,7 +529,7 @@ export class SkillWebUI {
         if (ok) {
           if (this.sound) this.sound.playChime();
           if (this.ui) {
-            this.ui.notify(`¡Aprendiste: ${nodo.nombre}! ${nodo.icono}`, 'success');
+            this.ui.notify(`¡${nodo.nombre} mejorada a Nivel ${nodo.nivel}! 🌟`, 'success');
             this.ui.render();
           }
           this.render();
@@ -477,4 +538,5 @@ export class SkillWebUI {
     }
   }
 }
+
 

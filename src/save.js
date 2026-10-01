@@ -35,10 +35,17 @@ export class SaveManager {
         }
       };
 
-      // Restaurar callbacks de efecto en cada nodo del árbol
+      // Restaurar callbacks de efecto y propiedades de nivel en cada nodo del árbol
       for (const k in INITIAL_STATE.arbolHabilidades) {
-        if (state.data.arbolHabilidades[k]) {
-          state.data.arbolHabilidades[k].efecto = INITIAL_STATE.arbolHabilidades[k].efecto;
+        const nodo = state.data.arbolHabilidades[k];
+        if (nodo) {
+          nodo.efecto = INITIAL_STATE.arbolHabilidades[k].efecto;
+          nodo.maxNivel = 20;
+          if (typeof nodo.nivel !== 'number') {
+            nodo.nivel = nodo.comprada ? 1 : 0;
+          }
+          if (!nodo.costoBase) nodo.costoBase = INITIAL_STATE.arbolHabilidades[k].costoBase;
+          nodo.costo = state.getCostoHabilidad(k, nodo.nivel);
         }
       }
 
@@ -48,8 +55,11 @@ export class SaveManager {
           if (loaded.mejoras[k]?.comprada) {
             const targetId = k === 'cantoChucaoArmonico' ? 'oidoChucao' : k;
             if (state.data.arbolHabilidades[targetId]) {
-              state.data.arbolHabilidades[targetId].comprada = true;
-              state.data.arbolHabilidades[targetId].desbloqueada = true;
+              const tn = state.data.arbolHabilidades[targetId];
+              tn.comprada = true;
+              tn.desbloqueada = true;
+              if (tn.nivel < 1) tn.nivel = 1;
+              tn.costo = state.getCostoHabilidad(targetId, tn.nivel);
             }
           }
         }
@@ -59,7 +69,10 @@ export class SaveManager {
       for (const key in state.data.arbolHabilidades) {
         const nodo = state.data.arbolHabilidades[key];
         if (nodo.prerrequisitos && nodo.prerrequisitos.length > 0) {
-          if (nodo.prerrequisitos.some(preId => state.data.arbolHabilidades[preId]?.comprada)) {
+          if (nodo.prerrequisitos.some(preId => {
+            const p = state.data.arbolHabilidades[preId];
+            return p && (p.nivel > 0 || p.comprada);
+          })) {
             nodo.desbloqueada = true;
           }
         }

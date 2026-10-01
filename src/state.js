@@ -192,99 +192,126 @@ export const INITIAL_STATE = {
   probabilidadCritico: 0,
   multiplicadorCritico: 5,
 
-  // Árbol de Habilidades: "Raíces de la Armonía" (3 Ramas Estratégicas)
+  // Árbol de Habilidades: "Raíces de la Armonía" (3 Ramas Estratégicas + Conexiones)
   arbolHabilidades: {
-    // === RAMA 1: SENDA DEL RECOLECTOR (Clicks & Microeventos Activos) ===
     // === NODO RAÍZ CENTRAL (Semilla del Canelo) ===
     semillaCanelo: {
       id: "semillaCanelo",
       nombre: "Semilla del Canelo",
       rama: "centro",
       tier: 0,
-      costo: 0,
+      nivel: 1,
+      maxNivel: 20,
+      costoBase: 45,
+      costo: 45,
       icono: "🌰",
-      desc: "El árbol sagrado del pueblo mapuche y corazón espiritual del claro.",
+      desc: "Corazón espiritual del bosque. +3% de producción por segundo por cada nivel.",
       prerrequisitos: [],
+      modoPrerrequisito: "all",
       desbloqueada: true,
       comprada: true,
       efecto: () => {}
     },
 
-    // === RAMA 1: SENDA DEL RECOLECTOR (Clicks & Microeventos Activos) ===
+    // === RAMA 1: SENDA DEL RECOLECTOR (Clicks, Críticos & Microeventos) ===
     cucharaAlerce: {
       id: "cucharaAlerce",
       nombre: "Cuchara de Alerce",
       rama: "recolector",
       tier: 1,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 35,
       costo: 35,
       icono: "🥄",
-      desc: "Tallada a mano. +2 maquis directos por cada click manual en el arbusto.",
+      desc: "Tallada a mano. +2 maquis directos al clic manual y +1.5 maquis/clic por cada nivel (+3% MPS/nivel).",
       prerrequisitos: ["semillaCanelo"],
+      modoPrerrequisito: "all",
       desbloqueada: true,
       comprada: false,
-      efecto: (s) => { s.maquisPerClick += 2; }
+      efecto: (s) => {}
     },
     brotesRapidos: {
       id: "brotesRapidos",
       nombre: "Brotes Rápidos",
       rama: "recolector",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 90,
       costo: 90,
       icono: "🌱",
-      desc: "Cosecha ágil: +1 maqui base adicional en cada clic manual.",
+      desc: "Cosecha ágil: +1 maqui base por clic y +3% de producción pasiva por nivel.",
       prerrequisitos: ["cucharaAlerce"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.maquisPerClick += 1; }
+      efecto: (s) => {}
     },
     cosechaCertera: {
       id: "cosechaCertera",
       nombre: "Cosecha Certera",
       rama: "recolector",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 180,
       costo: 180,
       icono: "🎯",
-      desc: "Ojo experto para bayas maduras. 18% de probabilidad de Golpe Crítico (x5 maquis) al hacer click.",
-      prerrequisitos: ["cucharaAlerce"],
+      desc: "Ojo experto para bayas maduras: +12% prob. de Crítico base (+1.2%/nvl) y +0.2x al multiplicador por nivel.",
+      prerrequisitos: ["cucharaAlerce", "brotesRapidos"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.probabilidadCritico = 0.18; s.multiplicadorCritico = 5; }
+      efecto: (s) => {}
     },
     punteriaAustral: {
       id: "punteriaAustral",
       nombre: "Puntería Austral",
       rama: "recolector",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 420,
       costo: 420,
       icono: "✨",
-      desc: "Precisión en los arbustos: +3% de probabilidad adicional de Golpe Crítico.",
+      desc: "Precisión en los arbustos: +0.8% de probabilidad de crítico y +0.15x multiplicador por nivel.",
       prerrequisitos: ["cosechaCertera"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.probabilidadCritico += 0.03; }
+      efecto: (s) => {}
     },
     oidoChucao: {
       id: "oidoChucao",
       nombre: "Trino del Chucao",
       rama: "recolector",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 320,
       costo: 320,
       icono: "🎶",
-      desc: "Atento al monte. El Chucao y la Baya Dorada aparecen un 30% más seguido y la suerte dura 45s.",
+      desc: "Atento al monte. El Chucao y la Baya Dorada aparecen un 2.5% más seguido y la suerte dura +1.5s por nivel.",
       prerrequisitos: ["cucharaAlerce"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.armonia *= 1.15; }
+      efecto: (s) => {}
     },
     suerteProlongada: {
       id: "suerteProlongada",
       nombre: "Suerte Prolongada",
       rama: "recolector",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 600,
       costo: 600,
       icono: "⏳",
-      desc: "El canto de buena fortuna del Chucao dura 15 segundos adicionales.",
+      desc: "El canto de buena fortuna del Chucao dura +2s adicionales y otorga +0.1x al multiplicador por nivel.",
       prerrequisitos: ["oidoChucao"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -294,10 +321,14 @@ export const INITIAL_STATE = {
       nombre: "Infusión de Canelo",
       rama: "recolector",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 1800,
       costo: 1800,
       icono: "🍵",
-      desc: "Té místico. Los clicks absorben un 4% de la producción pasiva por segundo, y acariciar otorga 25 maquis directos.",
-      prerrequisitos: ["cosechaCertera", "oidoChucao"],
+      desc: "Té místico. Los clics absorben 3.5% (+0.5%/nvl) del MPS y acariciar pudús otorga +15 maquis por nivel.",
+      prerrequisitos: ["cosechaCertera", "oidoChucao", "armoniaVocal"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -307,13 +338,17 @@ export const INITIAL_STATE = {
       nombre: "Lluvia de Primavera",
       rama: "recolector",
       tier: 4,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 6500,
       costo: 6500,
       icono: "⭐",
-      desc: "Maestría recolectora. Eleva la probabilidad de crítico a 30% y otorga +35% de producción global.",
+      desc: "Maestría recolectora: +6% a la producción pasiva global y +0.6% de probabilidad de crítico por nivel.",
       prerrequisitos: ["teCanelo"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.probabilidadCritico = 0.30; s.armonia *= 1.35; }
+      efecto: (s) => {}
     },
 
     // === RAMA 2: SENDA DE LA MANADA (Pudús & Automatización Pasiva) ===
@@ -322,52 +357,65 @@ export const INITIAL_STATE = {
       nombre: "Nido de Hojarasca",
       rama: "manada",
       tier: 1,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 60,
       costo: 60,
       icono: "🌿",
-      desc: "Camas mullidas. +20% a la producción base de brotes de maqui y camitas de musgo.",
+      desc: "Camas mullidas. +15% de producción base a brotes de maqui y camitas de musgo por cada nivel.",
       prerrequisitos: ["semillaCanelo"],
+      modoPrerrequisito: "all",
       desbloqueada: true,
       comprada: false,
-      efecto: (s) => {
-        s.productores.broteMaqui.produccionBase *= 1.2;
-        s.productores.camitaMusgo.produccionBase *= 1.2;
-      }
+      efecto: (s) => {}
     },
     camitasAcolchadas: {
       id: "camitasAcolchadas",
       nombre: "Camitas Acolchadas",
       rama: "manada",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 110,
       costo: 110,
       icono: "🛏️",
-      desc: "+15% de producción base a todas las Camitas de Musgo del refugio.",
+      desc: "+12% a la producción base de todas las Camitas de Musgo y +3% general por nivel.",
       prerrequisitos: ["nidoHojarasca"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.productores.camitaMusgo.produccionBase *= 1.15; }
+      efecto: (s) => {}
     },
     zapatosMusgo: {
       id: "zapatosMusgo",
       nombre: "Zapatitos de Musgo",
       rama: "manada",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 240,
       costo: 240,
       icono: "🍃",
-      desc: "Los pudús caminan silenciosos sin asustar a la fauna: +35% de producción pasiva global.",
-      prerrequisitos: ["nidoHojarasca"],
+      desc: "Los pudús caminan silenciosos sin asustar a la fauna: +4% de producción pasiva global por nivel.",
+      prerrequisitos: ["nidoHojarasca", "camitasAcolchadas"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.armonia *= 1.35; }
+      efecto: (s) => {}
     },
     pasosSilenciosos: {
       id: "pasosSilenciosos",
       nombre: "Pasos Silenciosos",
       rama: "manada",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 380,
       costo: 380,
       icono: "🐾",
-      desc: "+15% de velocidad a los pudús al trotar por el claro, generando maquis con más alegría.",
+      desc: "+5% de velocidad a los pudús al trotar por el claro y +3% de producción global por nivel.",
       prerrequisitos: ["zapatosMusgo"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -377,23 +425,31 @@ export const INITIAL_STATE = {
       nombre: "Bufandas Chilotas",
       rama: "manada",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 480,
       costo: 480,
       icono: "🧣",
-      desc: "Lana tejida que abriga del frío: +40% de producción pasiva y +8% adicional por cada cría.",
-      prerrequisitos: ["nidoHojarasca"],
+      desc: "Lana tejida que abriga del frío: +4% de producción pasiva y +2% adicional por cada cría por nivel.",
+      prerrequisitos: ["nidoHojarasca", "oidoChucao"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.armonia *= 1.4; }
+      efecto: (s) => {}
     },
     ternuraCervatillos: {
       id: "ternuraCervatillos",
       nombre: "Ternura de Cervatillos",
       rama: "manada",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 720,
       costo: 720,
       icono: "🦌",
-      desc: "+5% adicional de producción pasiva por cada cría residente en el claro.",
+      desc: "+2.5% adicional de producción pasiva por cada cría residente en el claro por nivel (+3% MPS/nivel).",
       prerrequisitos: ["bufandasChilotas"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -403,10 +459,14 @@ export const INITIAL_STATE = {
       nombre: "Coro del Bosque",
       rama: "manada",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 2200,
       costo: 2200,
       icono: "🎤",
-      desc: "Sinergia especial: cada pudú residente único (Miku, Teto, Mizuki, Neru y Esme) aporta +12% a la producción total.",
-      prerrequisitos: ["zapatosMusgo", "bufandasChilotas"],
+      desc: "Sinergia especial: cada pudú residente único (Miku, Teto, Mizuki, Neru y Esme) aporta +3% a la producción total por nivel.",
+      prerrequisitos: ["zapatosMusgo", "bufandasChilotas", "pasosSilenciosos", "teCanelo"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -416,25 +476,33 @@ export const INITIAL_STATE = {
       nombre: "Danza Ancestral",
       rama: "manada",
       tier: 4,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 9000,
       costo: 9000,
       icono: "👑",
-      desc: "Lazo eterno con los espíritus. +50% permanente a toda la manada y corazones al trotar.",
+      desc: "Lazo eterno con los espíritus. +8% permanente a toda la manada por nivel y corazones brillantes al trotar.",
       prerrequisitos: ["armoniaVocal"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.armonia *= 1.5; }
+      efecto: (s) => {}
     },
 
-    // === RAMA 3: SENDA DEL TALLER AUSTRAL (Olla de Greda & Clima) ===
+    // === RAMA 3: SENDA DEL TALLER AUSTRAL (Olla de Greda, Mermeladas & Clima) ===
     lenaLuma: {
       id: "lenaLuma",
       nombre: "Leña Seca de Luma",
       rama: "taller",
       tier: 1,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 90,
       costo: 90,
       icono: "🪵",
-      desc: "Brasas duraderas. Reduce el tiempo de cocción en la olla de greda un 25%.",
-      prerrequisitos: ["semillaCanelo"],
+      desc: "Brasas duraderas. Reduce el tiempo de cocción en la olla un 2% por nivel (hasta -40%) y da +3% MPS/nivel.",
+      prerrequisitos: ["semillaCanelo", "cucharaAlerce", "nidoHojarasca"],
+      modoPrerrequisito: "any",
       desbloqueada: true,
       comprada: false,
       efecto: () => {}
@@ -444,10 +512,14 @@ export const INITIAL_STATE = {
       nombre: "Brasas Eternas",
       rama: "taller",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 150,
       costo: 150,
       icono: "🪵",
-      desc: "Reduce un 10% adicional el tiempo de cocción de todas las recetas en la olla.",
+      desc: "Reduce un 1.5% adicional el tiempo de cocción y +8% de producción a las ollas de greda por nivel.",
       prerrequisitos: ["lenaLuma"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -457,10 +529,14 @@ export const INITIAL_STATE = {
       nombre: "Fuegos Vivos",
       rama: "taller",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 280,
       costo: 280,
       icono: "🔥",
-      desc: "Los buffs de kuchen y cocina duran 15% más de tiempo en el claro.",
+      desc: "Los buffs de kuchen y cocina duran +4s y aportan +0.15x de multiplicador por nivel.",
       prerrequisitos: ["lenaLuma"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -470,10 +546,14 @@ export const INITIAL_STATE = {
       nombre: "Mermelada Secreta",
       rama: "taller",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 380,
       costo: 380,
       icono: "🍯",
-      desc: "Cada frasco de mermelada elaborado otorga +6% permanente a la Armonía (en vez de +4%).",
-      prerrequisitos: ["lenaLuma"],
+      desc: "Cada frasco de mermelada elaborado otorga +0.3% permanente de producción adicional por nivel.",
+      prerrequisitos: ["lenaLuma", "brasasEternas"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -483,10 +563,14 @@ export const INITIAL_STATE = {
       nombre: "Dulzor Austral",
       rama: "taller",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 640,
       costo: 640,
       icono: "🍯",
-      desc: "+2% adicional de Armonía permanente por cada frasco de mermelada elaborado.",
-      prerrequisitos: ["recetaMermelada"],
+      desc: "+0.2% adicional de Armonía por frasco de mermelada y +3% MPS por nivel.",
+      prerrequisitos: ["recetaMermelada", "ternuraCervatillos"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -496,10 +580,14 @@ export const INITIAL_STATE = {
       nombre: "Amuleto de Arcoíris",
       rama: "taller",
       tier: 2,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 750,
       costo: 750,
       icono: "🌈",
-      desc: "El clima de Arcoíris y Sol es más frecuente y multiplica la producción x2.5.",
-      prerrequisitos: ["lenaLuma"],
+      desc: "El clima de Arcoíris es 3% más frecuente y su multiplicador sube +0.2x por nivel.",
+      prerrequisitos: ["lenaLuma", "fuegosVivos", "suerteProlongada"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -509,10 +597,14 @@ export const INITIAL_STATE = {
       nombre: "Brillo Solar",
       rama: "taller",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 1100,
       costo: 1100,
       icono: "☀️",
-      desc: "El clima de Arcoíris y Sol dura 30 segundos adicionales al despejarse.",
+      desc: "El clima despejado y de arcoíris dura +4s adicionales y da +3% MPS por nivel.",
       prerrequisitos: ["amuletoArcoiris"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
       efecto: () => {}
@@ -522,26 +614,34 @@ export const INITIAL_STATE = {
       nombre: "Corona de Copihues",
       rama: "taller",
       tier: 3,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 3600,
       costo: 3600,
       icono: "🌺",
-      desc: "La flor sagrada bendice el claro: duplica (x2) toda la producción y los kuchenes duran 180s.",
-      prerrequisitos: ["recetaMermelada", "amuletoArcoiris"],
+      desc: "Bendición del Copihue: +7% a la producción global y +6s de duración a los kuchenes por nivel.",
+      prerrequisitos: ["recetaMermelada", "amuletoArcoiris", "armoniaVocal"],
+      modoPrerrequisito: "any",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.armonia *= 2.0; }
+      efecto: (s) => {}
     },
     fuegoSagrado: {
       id: "fuegoSagrado",
       nombre: "Fuego del Canelo",
       rama: "taller",
       tier: 4,
+      nivel: 0,
+      maxNivel: 20,
+      costoBase: 12000,
       costo: 12000,
       icono: "🔥",
-      desc: "Llama ancestral permanente. +50% permanente de producción general a todo el claro.",
+      desc: "Fuego ancestral del Canelo: +10% de producción pasiva general a todo el claro por nivel.",
       prerrequisitos: ["coronaCopihues"],
+      modoPrerrequisito: "all",
       desbloqueada: false,
       comprada: false,
-      efecto: (s) => { s.armonia *= 1.5; }
+      efecto: (s) => {}
     }
   },
 
@@ -603,6 +703,24 @@ export class GameState {
     if (this.data.arbolHabilidades.oidoChucao) {
       this.data.mejoras.cantoChucaoArmonico = this.data.arbolHabilidades.oidoChucao;
     }
+    // Asegurar propiedades de nivel y costo para todos los nodos
+    for (const key in this.data.arbolHabilidades) {
+      const n = this.data.arbolHabilidades[key];
+      if (typeof n.nivel !== 'number') {
+        n.nivel = n.comprada ? 1 : 0;
+      }
+      if (!n.maxNivel) n.maxNivel = 20;
+      if (!n.costoBase) n.costoBase = n.costo || 50;
+      if (!n.costo) n.costo = this.getCostoHabilidad(key, n.nivel);
+    }
+  }
+
+  // Costo para subir al siguiente nivel de una habilidad
+  getCostoHabilidad(id, nivelActual) {
+    const nodo = this.data.arbolHabilidades[id];
+    if (!nodo) return Infinity;
+    const factor = nodo.tier === 4 ? 1.25 : (nodo.tier === 3 ? 1.23 : 1.21);
+    return Math.round(nodo.costoBase * Math.pow(factor, nivelActual));
   }
 
   // Comprobar si cumple prerrequisitos de una habilidad
@@ -610,34 +728,54 @@ export class GameState {
     const nodo = this.data.arbolHabilidades[id];
     if (!nodo) return false;
     if (!nodo.prerrequisitos || nodo.prerrequisitos.length === 0) return true;
-    return nodo.prerrequisitos.every(preId => this.data.arbolHabilidades[preId]?.comprada);
+
+    // Si modoPrerrequisito es 'any', basta que al menos uno tenga nivel >= 1
+    if (nodo.modoPrerrequisito === 'any') {
+      return nodo.prerrequisitos.some(preId => {
+        const p = this.data.arbolHabilidades[preId];
+        return p && (p.nivel > 0 || p.comprada);
+      });
+    }
+
+    // Por defecto 'all': todos deben tener nivel >= 1
+    return nodo.prerrequisitos.every(preId => {
+      const p = this.data.arbolHabilidades[preId];
+      return p && (p.nivel > 0 || p.comprada);
+    });
   }
 
-  // Comprobar si una habilidad del árbol puede ser aprendida
+  // Comprobar si una habilidad del árbol puede ser aprendida o mejorada de nivel (hasta nivel 20)
   puedeAprenderHabilidad(id) {
     const nodo = this.data.arbolHabilidades[id];
-    if (!nodo || nodo.comprada) return false;
+    if (!nodo) return false;
+    if (nodo.nivel >= (nodo.maxNivel || 20)) return false;
     if (!this.cumplePrerrequisitos(id)) return false;
     return this.data.maquis >= nodo.costo;
   }
 
-  // Aprender habilidad del árbol de habilidades
+  // Aprender o subir de nivel una habilidad del árbol
   aprenderHabilidad(id) {
     if (!this.puedeAprenderHabilidad(id)) return false;
     const nodo = this.data.arbolHabilidades[id];
     this.data.maquis -= nodo.costo;
+    nodo.nivel = (nodo.nivel || 0) + 1;
     nodo.comprada = true;
     nodo.desbloqueada = true;
 
-    // Ejecutar efecto mecánico en el estado
+    // Calcular costo para el próximo nivel si no llegó al máximo
+    if (nodo.nivel < (nodo.maxNivel || 20)) {
+      nodo.costo = this.getCostoHabilidad(id, nodo.nivel);
+    }
+
+    // Ejecutar efecto mecánico en el estado si aplica
     if (typeof nodo.efecto === 'function') {
-      nodo.efecto(this.data);
+      nodo.efecto(this.data, nodo.nivel);
     }
 
     // Desbloquear nodos hijos para que se vean disponibles en el árbol
     for (const key in this.data.arbolHabilidades) {
       const hijo = this.data.arbolHabilidades[key];
-      if (!hijo.comprada && hijo.prerrequisitos && hijo.prerrequisitos.includes(id)) {
+      if (hijo.nivel === 0 && this.cumplePrerrequisitos(key)) {
         hijo.desbloqueada = true;
       }
     }
@@ -648,8 +786,32 @@ export class GameState {
 
   // Evalúa si un clic en el arbusto resulta en golpe crítico
   evaluarCritico() {
-    if (this.data.probabilidadCritico > 0 && Math.random() < this.data.probabilidadCritico) {
-      return this.data.multiplicadorCritico || 5;
+    let prob = this.data.probabilidadCritico;
+    let mult = this.data.multiplicadorCritico || 5;
+
+    // Cosecha Certera (Crítico activo)
+    const nvCosecha = this.data.arbolHabilidades.cosechaCertera?.nivel || 0;
+    if (nvCosecha > 0) {
+      prob += 0.12 + (nvCosecha * 0.012); // hasta +36%
+      mult += nvCosecha * 0.2;
+    }
+
+    // Puntería Austral
+    const nvPunteria = this.data.arbolHabilidades.punteriaAustral?.nivel || 0;
+    if (nvPunteria > 0) {
+      prob += nvPunteria * 0.008;
+      mult += nvPunteria * 0.15;
+    }
+
+    // Lluvia de Primavera
+    const nvLluvia = this.data.arbolHabilidades.lluviaPrimavera?.nivel || 0;
+    if (nvLluvia > 0) {
+      prob += nvLluvia * 0.006;
+      mult += nvLluvia * 0.25;
+    }
+
+    if (prob > 0 && Math.random() < Math.min(0.85, prob)) {
+      return mult;
     }
     return 1;
   }
@@ -666,67 +828,148 @@ export class GameState {
     let totalBase = 0;
     for (const key in this.data.productores) {
       const prod = this.data.productores[key];
-      totalBase += prod.cantidad * prod.produccionBase;
+      let factorProd = 1.0;
+      // Nido de Hojarasca potencia brotes y camitas
+      const nvNido = this.data.arbolHabilidades.nidoHojarasca?.nivel || 0;
+      if (nvNido > 0 && (prod.id === 'broteMaqui' || prod.id === 'camitaMusgo')) {
+        factorProd += nvNido * 0.15;
+      }
+      // Camitas Acolchadas potencia camitas de musgo
+      const nvCam = this.data.arbolHabilidades.camitasAcolchadas?.nivel || 0;
+      if (nvCam > 0 && prod.id === 'camitaMusgo') {
+        factorProd += nvCam * 0.12;
+      }
+      // Brasas Eternas potencia olla de greda
+      const nvBrasas = this.data.arbolHabilidades.brasasEternas?.nivel || 0;
+      if (nvBrasas > 0 && prod.id === 'ollaGreda') {
+        factorProd += nvBrasas * 0.08;
+      }
+
+      totalBase += prod.cantidad * (prod.produccionBase * factorProd);
     }
 
     // Sinergia: Camitas de musgo potencian a la manada (+2.5% por camita)
     const bonoCamitas = 1 + (this.data.productores.camitaMusgo.cantidad * 0.025);
 
-    // Efecto de mermeladas elaboradas (+6% permanente por frasco si tiene Mermelada Secreta, sino +4%)
-    const factorMermelada = this.data.arbolHabilidades.recetaMermelada?.comprada ? 0.06 : 0.04;
-    const bonoMermelada = 1 + (this.data.mermeladas * factorMermelada);
-
-    // Multiplicador del clima actual (Amuleto de arcoíris potencia a x2.5 en arcoíris)
-    let bonoClima = this.data.clima.multiplicador;
-    if (this.data.clima.tipo === 'arcoiris_sol' && this.data.arbolHabilidades.amuletoArcoiris?.comprada) {
-      bonoClima = 2.5;
+    // Multiplicador general por todos los niveles del árbol de habilidades (+3% por cada nivel aprendido)
+    let bonoNivelesArbol = 1.0;
+    for (const key in this.data.arbolHabilidades) {
+      const n = this.data.arbolHabilidades[key];
+      if (n.nivel > 0) {
+        bonoNivelesArbol += n.nivel * 0.03;
+      }
     }
 
-    // Multiplicador de suerte temporal del Chucao
-    const bonoChucao = this.data.chucao.multiplicadorSuerte;
+    // Efecto de mermeladas elaboradas (+4% base + 0.3% por nivel de recetaMermelada + 0.2% por nivel de dulzorAustral)
+    const nvRecetaMerm = this.data.arbolHabilidades.recetaMermelada?.nivel || 0;
+    const nvDulzor = this.data.arbolHabilidades.dulzorAustral?.nivel || 0;
+    const factorMermelada = 0.04 + (nvRecetaMerm * 0.003) + (nvDulzor * 0.002);
+    const bonoMermelada = 1 + (this.data.mermeladas * factorMermelada);
+
+    // Multiplicador del clima actual (Amuleto de arcoíris potencia según nivel)
+    let bonoClima = this.data.clima.multiplicador;
+    if (this.data.clima.tipo === 'arcoiris_sol') {
+      const nvAmuleto = this.data.arbolHabilidades.amuletoArcoiris?.nivel || 0;
+      bonoClima = 2.0 + (nvAmuleto * 0.2);
+    }
+
+    // Multiplicador de suerte temporal del Chucao (+ bono por suerteProlongada)
+    const nvSuerte = this.data.arbolHabilidades.suerteProlongada?.nivel || 0;
+    const bonoChucao = this.data.chucao.multiplicadorSuerte > 1
+      ? this.data.chucao.multiplicadorSuerte + (nvSuerte * 0.1)
+      : 1.0;
 
     // Multiplicador por caricia a los pudús (+35% temporal)
     const bonoCaricia = this.data.caricias.multiplicadorCaricia;
 
-    // Buff temporal de cocina (Kuchen u otros)
-    const bonoBuffCocina = this.data.buffCocina.multiplicador;
+    // Buff temporal de cocina (Kuchen u otros + fuegosVivos)
+    const nvFuegos = this.data.arbolHabilidades.fuegosVivos?.nivel || 0;
+    const bonoBuffCocina = this.data.buffCocina.segundosRestantes > 0
+      ? this.data.buffCocina.multiplicador + (nvFuegos * 0.15)
+      : 1.0;
 
     // Buff de agua de la Ranita de Darwin (+30% a acequias y producción)
     const bonoRanita = this.data.ranitaDarwin.segundosBuffAgua > 0 ? 1.3 : 1.0;
 
-    // Sinergia Árbol: Coro del Bosque (+12% por cada pudú especial residente)
+    // Sinergia Árbol: Coro del Bosque (+3% por nivel por cada pudú especial residente)
     let bonoPudusEspeciales = 1.0;
-    if (this.data.arbolHabilidades.armoniaVocal?.comprada) {
+    const nvCoro = this.data.arbolHabilidades.armoniaVocal?.nivel || 0;
+    if (nvCoro > 0) {
       const countEspeciales = this.data.pudus.filter(p => ['miku', 'teto', 'mizuki', 'neru', 'esme'].includes(p.tipo)).length;
-      bonoPudusEspeciales += countEspeciales * 0.12;
+      bonoPudusEspeciales += countEspeciales * (nvCoro * 0.03);
     }
 
-    // Sinergia Árbol: Bufandas chilotas (+8% por cada cervatillo)
-    let bonoCervatillos = 1.0;
-    if (this.data.arbolHabilidades.bufandasChilotas?.comprada) {
+    // Sinergia Árbol: Bufandas chilotas (+4% por nivel + 2% adicional por cada cervatillo por nivel)
+    let bonoBufandas = 1.0;
+    const nvBufandas = this.data.arbolHabilidades.bufandasChilotas?.nivel || 0;
+    if (nvBufandas > 0) {
       const countFawns = this.data.pudus.filter(p => p.tipo === 'fawn').length;
-      bonoCervatillos += countFawns * 0.08;
+      bonoBufandas += (nvBufandas * 0.04) + (countFawns * nvBufandas * 0.02);
     }
+
+    // Sinergia Árbol: Ternura de cervatillos (+2.5% adicional por cría por nivel)
+    let bonoTernura = 1.0;
+    const nvTernura = this.data.arbolHabilidades.ternuraCervatillos?.nivel || 0;
+    if (nvTernura > 0) {
+      const countFawns = this.data.pudus.filter(p => p.tipo === 'fawn').length;
+      bonoTernura += countFawns * nvTernura * 0.025;
+    }
+
+    // Sinergia Árbol: Zapatitos de Musgo (+4% global por nivel)
+    const nvZapatos = this.data.arbolHabilidades.zapatosMusgo?.nivel || 0;
+    const bonoZapatos = 1 + (nvZapatos * 0.04);
+
+    // Sinergia Árbol: Pasos silenciosos (+3% global por nivel)
+    const nvPasos = this.data.arbolHabilidades.pasosSilenciosos?.nivel || 0;
+    const bonoPasos = 1 + (nvPasos * 0.03);
+
+    // Sinergias Tier 4 Ultimates:
+    // Lluvia de Primavera (+6% global por nivel)
+    const nvLluvia = this.data.arbolHabilidades.lluviaPrimavera?.nivel || 0;
+    const bonoLluvia = 1 + (nvLluvia * 0.06);
+
+    // Danza Ancestral (+8% global por nivel)
+    const nvDanza = this.data.arbolHabilidades.llamadoAncestral?.nivel || 0;
+    const bonoDanza = 1 + (nvDanza * 0.08);
+
+    // Corona de Copihues (+7% global por nivel)
+    const nvCorona = this.data.arbolHabilidades.coronaCopihues?.nivel || 0;
+    const bonoCorona = 1 + (nvCorona * 0.07);
+
+    // Fuego Sagrado (+10% global por nivel)
+    const nvFuego = this.data.arbolHabilidades.fuegoSagrado?.nivel || 0;
+    const bonoFuego = 1 + (nvFuego * 0.10);
 
     // Multiplicador de ritmo
     const bonoRitmo = this.data.ritmo === 'veloz' ? 1.5 : 1.0;
 
-    return totalBase * this.data.armonia * bonoCamitas * bonoMermelada * bonoClima * bonoChucao * bonoCaricia * bonoBuffCocina * bonoRanita * bonoPudusEspeciales * bonoCervatillos * bonoRitmo;
+    return totalBase * this.data.armonia * bonoNivelesArbol * bonoCamitas * bonoMermelada * bonoClima * bonoChucao * bonoCaricia * bonoBuffCocina * bonoRanita * bonoPudusEspeciales * bonoBufandas * bonoTernura * bonoZapatos * bonoPasos * bonoLluvia * bonoDanza * bonoCorona * bonoFuego * bonoRitmo;
   }
 
   // Producción manual por click base
   getMaquisPorClick() {
     let porClick = this.data.maquisPerClick;
     
-    // Si tiene la infusión de canelo sagrado, los clicks escalan con una fracción del MPS
-    if (this.data.arbolHabilidades.teCanelo?.comprada || this.data.mejoras.teCanelo?.comprada) {
-      porClick += this.getMaquisPorSegundo() * 0.04;
+    // Cuchara de Alerce (+1.5 por nivel)
+    const nvCuchara = this.data.arbolHabilidades.cucharaAlerce?.nivel || 0;
+    porClick += nvCuchara * 1.5;
+
+    // Brotes Rápidos (+1 por nivel)
+    const nvBrotes = this.data.arbolHabilidades.brotesRapidos?.nivel || 0;
+    porClick += nvBrotes * 1.0;
+
+    // Si tiene la infusión de canelo sagrado, los clicks escalan con una fracción creciente del MPS
+    const nvTe = this.data.arbolHabilidades.teCanelo?.nivel || 0;
+    if (nvTe > 0) {
+      const pctMPS = 0.035 + (nvTe * 0.005); // 3.5% up to 13.5% del MPS en cada clic manual
+      porClick += this.getMaquisPorSegundo() * pctMPS;
     }
 
     const bonoChucao = this.data.chucao.multiplicadorSuerte;
     let bonoClima = 1;
     if (this.data.clima.tipo === 'arcoiris_sol') {
-      bonoClima = this.data.arbolHabilidades.amuletoArcoiris?.comprada ? 2.5 : 2.0;
+      const nvAmuleto = this.data.arbolHabilidades.amuletoArcoiris?.nivel || 0;
+      bonoClima = 2.0 + (nvAmuleto * 0.2);
     }
     const bonoCaricia = this.data.caricias.multiplicadorCaricia > 1 ? 1.25 : 1.0;
     const bonoRitmo = this.data.ritmo === 'veloz' ? 1.5 : 1.0;

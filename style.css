@@ -2650,6 +2650,129 @@ body {
   font-size: 12.5px;
 }
 
+/* Badge de Nivel en el Nodo (1/20 .. MAX) */
+.web-node-badge-level {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: #111e15;
+  color: #fbbf24;
+  border: 1.5px solid #d97706;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  line-height: 1.1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+  z-index: 10;
+  font-family: inherit;
+}
+
+.web-node-wrapper.node-diamond .web-node-badge-level,
+.web-node-wrapper.node-master_diamond .web-node-badge-level {
+  transform: rotate(-45deg);
+  bottom: -2px;
+  right: -3px;
+}
+
+.web-node-badge-level.maxed {
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+  color: #1a0f02;
+  border-color: #fef08a;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.9);
+}
+
+.web-node-wrapper.node-maxed .web-node-inner {
+  border-color: #fef08a !important;
+  background: linear-gradient(135deg, #2e4d34, #142017);
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.8), inset 0 0 8px rgba(254, 240, 138, 0.6);
+  animation: pulse-maxed 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-maxed {
+  0% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5), inset 0 0 6px rgba(254, 240, 138, 0.4); }
+  100% { box-shadow: 0 0 22px rgba(251, 191, 36, 0.95), inset 0 0 12px rgba(254, 240, 138, 0.8); }
+}
+
+/* Barra de Nivel en el Inspector Flotante */
+.inspector-level-box {
+  margin: 10px 0;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.inspector-level-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.inspector-level-text strong {
+  color: #fbbf24;
+  font-size: 13px;
+}
+
+.inspector-level-bonus {
+  font-size: 11px;
+  color: #34d399;
+  font-weight: 700;
+  background: rgba(52, 211, 153, 0.12);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.inspector-level-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.inspector-level-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.inspector-level-fill.maxed {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.inspector-stats-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.stat-current strong {
+  color: #fbbf24;
+}
+
+.stat-next strong {
+  color: #38bdf8;
+}
+
+.stat-maxed {
+  color: #34d399;
+  font-weight: 700;
+}
+
+.web-btn-disabled.maxed {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(16, 185, 129, 0.2));
+  color: #fef08a;
+  border-color: rgba(254, 240, 138, 0.4);
+}
+
 /* ==========================================================================
    Adaptabilidad Responsive (Móvil y Pantallas Pequeñas)
    ========================================================================== */

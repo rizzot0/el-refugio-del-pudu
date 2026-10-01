@@ -657,18 +657,26 @@ export class GameUI {
         const puedeComprar = this.state.puedeAprenderHabilidad(nodeId);
         const esSeleccionado = this.selectedSkillId === nodeId;
 
+        const nivel = nodo.nivel || 0;
+        const maxNivel = nodo.maxNivel || 20;
+        const esMax = nivel >= maxNivel;
+
         let estadoClase = 'locked-prereqs';
         let estadoBadge = '🔒 Bloqueada';
 
-        if (nodo.comprada) {
-          estadoClase = 'learned';
-          estadoBadge = '✓ Aprendida';
+        if (esMax) {
+          estadoClase = 'learned maxed';
+          estadoBadge = '👑 Nivel MAX (20/20)';
         } else if (puedeComprar) {
           estadoClase = 'available';
-          estadoBadge = `✨ Desbloquear (🌰 ${nodo.costo.toLocaleString()})`;
+          const accion = nivel === 0 ? 'Desbloquear' : `Subir a Nvl ${nivel + 1}`;
+          estadoBadge = `✨ ${accion} (🌰 ${nodo.costo.toLocaleString()})`;
         } else if (cumplidos) {
           estadoClase = 'affordable-wait';
-          estadoBadge = `🌰 ${nodo.costo.toLocaleString()}`;
+          estadoBadge = `🌰 ${nodo.costo.toLocaleString()} (Nvl ${nivel + 1})`;
+        } else if (nivel > 0) {
+          estadoClase = 'learned';
+          estadoBadge = `Nivel ${nivel}/${maxNivel}`;
         }
 
         // Pill de prerrequisitos
@@ -676,30 +684,30 @@ export class GameUI {
         if (nodo.prerrequisitos && nodo.prerrequisitos.length > 0) {
           const preItems = nodo.prerrequisitos.map(pid => {
             const pNodo = arbol[pid];
-            const pOk = pNodo?.comprada;
+            const pOk = pNodo && (pNodo.nivel > 0 || pNodo.comprada);
             return `<span class="prereq-tag ${pOk ? 'done' : 'missing'}">${pOk ? '✓' : '🔒'} ${pNodo?.nombre || pid}</span>`;
           }).join(' ');
-          prereqHtml = `<div class="node-prereqs">${preItems}</div>`;
+          prereqHtml = `<div class="node-prereqs">${prereqHtml ? preItems : ''}</div>`;
         }
 
         const nodeEl = document.createElement('div');
         nodeEl.className = `skill-node-card ${estadoClase} ${esSeleccionado ? 'selected' : ''}`;
         nodeEl.dataset.nodeId = nodeId;
         nodeEl.innerHTML = `
-          <div class="node-icon-wrapper" style="border-color: ${nodo.comprada ? rama.color : 'rgba(255,255,255,0.15)'}">
+          <div class="node-icon-wrapper" style="border-color: ${nivel > 0 ? rama.color : 'rgba(255,255,255,0.15)'}">
             <span class="node-icon">${nodo.icono}</span>
           </div>
           <div class="node-info">
             <div class="node-title-row">
               <span class="node-name">${nodo.nombre}</span>
-              <span class="node-tier">T${nodo.tier}${nodo.tier === 4 ? ' ⭐' : ''}</span>
+              <span class="node-tier">T${nodo.tier} • Nvl ${nivel}/${maxNivel}${nodo.tier === 4 ? ' ⭐' : ''}</span>
             </div>
             <div class="node-desc">${nodo.desc}</div>
             ${prereqHtml}
           </div>
           <div class="node-action">
-            <button class="skill-buy-btn ${nodo.comprada ? 'btn-learned' : (puedeComprar ? 'btn-can-buy' : 'btn-disabled')}"
-                    ${!puedeComprar || nodo.comprada ? 'disabled' : ''}>
+            <button class="skill-buy-btn ${esMax ? 'btn-learned' : (puedeComprar ? 'btn-can-buy' : 'btn-disabled')}"
+                    ${!puedeComprar || esMax ? 'disabled' : ''}>
               ${estadoBadge}
             </button>
           </div>
@@ -711,7 +719,7 @@ export class GameUI {
             const ok = this.state.aprenderHabilidad(nodeId);
             if (ok) {
               this.sound.playChime();
-              this.notify(`¡Aprendiste: ${nodo.nombre}! ${nodo.icono}`, 'success');
+              this.notify(`¡${nodo.nombre} mejorada a Nivel ${nodo.nivel}! 🌟`, 'success');
               this.renderArbolHabilidades(true);
               if (this.isTreeModalOpen) this.renderArbolModal();
             }
@@ -737,20 +745,31 @@ export class GameUI {
       if (!buyBtn || !card.dataset.nodeId) return;
       const nodeId = card.dataset.nodeId;
       const nodo = arbol[nodeId];
-      if (!nodo || nodo.comprada) return;
+      if (!nodo) return;
 
+      const nivel = nodo.nivel || 0;
+      const maxNivel = nodo.maxNivel || 20;
+      const esMax = nivel >= maxNivel;
       const puedeComprar = this.state.puedeAprenderHabilidad(nodeId);
       const cumplidos = this.state.cumplePrerrequisitos(nodeId);
 
-      card.classList.toggle('available', puedeComprar);
-      card.classList.toggle('affordable-wait', !puedeComprar && cumplidos);
-      buyBtn.disabled = !puedeComprar;
-      buyBtn.classList.toggle('btn-can-buy', puedeComprar);
-      buyBtn.classList.toggle('btn-disabled', !puedeComprar);
-      if (puedeComprar) {
-        buyBtn.innerText = `✨ Desbloquear (🌰 ${nodo.costo.toLocaleString()})`;
+      card.classList.toggle('available', puedeComprar && !esMax);
+      card.classList.toggle('affordable-wait', !puedeComprar && cumplidos && !esMax);
+      card.classList.toggle('learned', nivel > 0 && !esMax);
+      card.classList.toggle('maxed', esMax);
+
+      buyBtn.disabled = !puedeComprar || esMax;
+      buyBtn.classList.toggle('btn-can-buy', puedeComprar && !esMax);
+      buyBtn.classList.toggle('btn-disabled', !puedeComprar && !esMax);
+      buyBtn.classList.toggle('btn-learned', esMax);
+
+      if (esMax) {
+        buyBtn.innerText = '👑 Nivel MAX (20/20)';
+      } else if (puedeComprar) {
+        const accion = nivel === 0 ? 'Desbloquear' : `Subir a Nvl ${nivel + 1}`;
+        buyBtn.innerText = `✨ ${accion} (🌰 ${nodo.costo.toLocaleString()})`;
       } else if (cumplidos) {
-        buyBtn.innerText = `🌰 ${nodo.costo.toLocaleString()}`;
+        buyBtn.innerText = `🌰 ${nodo.costo.toLocaleString()} (Nvl ${nivel + 1})`;
       }
     });
   }
