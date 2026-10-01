@@ -945,6 +945,173 @@ export const NERU_PUDU_FRAMES = {
 };
 
 // ==========================================================================
+// PUDÚ ESME (25x21) - Rulos esmeralda ondulados, estrellita amarilla y lentes
+// ==========================================================================
+export const ESME_PUDU_FRAMES = {
+  idle: [
+    "...O.O.1Gg...............",
+    "..gGGg.2Gdg..............",
+    ".g1GG.3Ggdd..............",
+    "3E3GG.dG1gd..............",
+    "33BBBB.dGgd..............",
+    ".OOOOBB.Ggd..............",
+    "...OOOBBD.d..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    ".......OBBOD.......DBBB..",
+    "........BODD.......DOBB..",
+    "........BODD.......DDOBB.",
+    "........BOD........DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O."
+  ],
+  walk1: [
+    "...O.O..1Gg..............",
+    "..gGGg..2Gdg.............",
+    ".g1GG.3.Ggdd.............",
+    "3E3GG.dG1gd..G...........",
+    "33BBBB.dGgd..d...........",
+    ".OOOOBB.Ggd..............",
+    "...OOOBBD.d..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "......OBB.OD.......DBBB..",
+    ".....OB...DD........DOBB.",
+    "....OB....DD........DDOBB",
+    "....O......D........DD.OB",
+    "...O.......D.........D.OO",
+    "...........D...........O."
+  ],
+  walk2: [
+    "...O.O.1Gg...............",
+    "..gGGg.2Gdg..............",
+    ".g1GG.3Ggdd..............",
+    "3E3GG.dG1gd..............",
+    "33BBBB.dGgd..............",
+    ".OOOOBB.Ggd..............",
+    "...OOOBBD.d..............",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD......DBBB..",
+    ".........BODD......DOBB..",
+    ".........BODD......DDOBB.",
+    ".........B.OD.......DD.OB",
+    ".........O.DD........D.OO",
+    ".........O..D..........O."
+  ],
+  eat: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "..O.O.1Gg.BBBDBBBDBBBBBBB",
+    "..gGGg.2GdgBOBBBBBBBBBBBO",
+    ".3E3GG3GgddVBD..LBBBBBBO.",
+    "33EBB.dGgd.OBOD....DBBB..",
+    ".EEB...Ggd.BODD....DOBB..",
+    ".EE.....d..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  sleep: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "....O.O.1Gg..............",
+    "...gGGg.2Gdg.............",
+    "..g1GG.3Ggdd.............",
+    ".3E3GG.dG1gd....OBOBO....",
+    "33EBB.dGgd.BBBOBBBBDBBBB.",
+    ".EEB.Ggd.BBBBBBBBBBBBBBBB",
+    "..E..d..OBBBDBBBDBBBBBBBB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........OBBOD.......DBBB.",
+    "........SOODD.......DOBB.",
+    "........................."
+  ],
+  drink: [
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    ".........................",
+    "........DDDD.OBOBO.......",
+    ".......DDBBBBOBBBBDBBBB..",
+    "......ODBBBBBBBBBBBBBBBB.",
+    ".....ODBBDBBBDBBBBBBBBBBB",
+    "....OBOBBBBBBBBBBBBBBBBBB",
+    "..O.O.1Gg.BBBDBBBDBBBBBBB",
+    "..gGGg.2GdgBOBBBBBBBBBBBO",
+    ".3E3GG3GgddVBD..LBBBBBBO.",
+    "33EBB.dGgd.OBOD....DBBB..",
+    ".EEB...Ggd.BODD....DOBB..",
+    ".EE.....d..BODD....DDOBB.",
+    "..E........BOD.....DD.OB.",
+    "........ODB........D..OO.",
+    "........SO.........D...O.",
+    ".........................",
+    "........................."
+  ],
+  happy: [
+    "...O.O..1Gg..g1..........",
+    "..gGGg.2GdgG.Gg..........",
+    ".g1GG.3Ggdd..dG..........",
+    "3E3GG.dGgd.dGgd..........",
+    "33BBBB.Ggd..Ggd..........",
+    ".OOOOBB.d................",
+    "...OOOBBD................",
+    "....OOBBBDDDDBOBOBO......",
+    "....OOBBBBOBOBBBBDBBBB...",
+    ".....OBBBBBBBBBBBBBBBBBB.",
+    ".....OBBBDBBBDBBBBBBBBBBB",
+    "......OBBBBBBBBBBBBBBBBBB",
+    "......OBBBBBBDBBBBBBBBBOB",
+    ".......OBBBOBBBBBBBBBBBBO",
+    ".......OBBOD....LBBBBBBO.",
+    "........BOD........DBBB..",
+    "........BOD.........DOB..",
+    ".........O..........DO...",
+    ".........................",
+    ".........................",
+    "........................."
+  ]
+};
+
+// ==========================================================================
 // PUDÚ BEBÉ / CERVATILLO (18x15) - Tierno, compacto y con pintas doradas
 // ==========================================================================
 export const FAWN_FRAMES = {
@@ -1094,7 +1261,13 @@ export const PUDU_COLOR_MAP = {
   'U': '#fef08a', // Neru Pale Yellow Highlight
   'J': '#b45309', // Neru Dark Amber Shadow
   'X': '#0f172a', // Neru Black Tie / Scrunchie & Phone Case
-  'F': '#38bdf8'  // Neru Phone Screen Cyan Glow
+  'F': '#38bdf8', // Neru Phone Screen Cyan Glow
+  'G': '#059669', // Esme Verde Esmeralda Base
+  'g': '#6ee7b7', // Esme Menta Brillo / Luces
+  'd': '#064e3b', // Esme Esmeralda Sombra Profunda
+  '1': '#fde047', // Esme Estrellita Amarilla
+  '2': '#f472b6', // Esme Florcita / Broche Rosa
+  '3': '#1e293b'  // Esme Marco de Lentes Redondos
 };
 
 // Accesorios en la cabeza ajustados al nuevo tamaño de 25x21 y crías

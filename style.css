@@ -703,6 +703,15 @@ body {
   color: #facc15;
 }
 
+.pudu-badge-esme {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.pudu-badge-esme strong {
+  color: #10b981;
+}
+
 .pudu-hat {
   font-size: 18px;
 }
